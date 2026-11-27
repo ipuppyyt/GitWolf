@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>GitWolf</title>
+    <link>https://github.com/ipuppyyt/GitWolf</link>
+    <description>GitWolf updates</description>
+    <language>en</language>
+    <item>
+      <title>Version 0.1.1</title>
+      <pubDate>Fri, 27 Nov 2026 13:28:04 +0000</pubDate>
+      <sparkle:version>1001</sparkle:version>
+      <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/ipuppyyt/GitWolf/releases/download/v0.1.1/GitWolf-0.1.1.zip" length="3875383" type="application/octet-stream" sparkle:edSignature="82jhLQnoyffPqqZIxAYcj/cJ6rPYx5z4HEV+VZTpDibo5IhqG8RKuZ8bix0MbN9AB3bS4r5WsutIPIgvedTMCg=="/>
+    </item>
+  </channel>
+</rss>
