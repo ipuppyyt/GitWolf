@@ -6,6 +6,14 @@
     <description>GitWolf updates</description>
     <language>en</language>
     <item>
+      <title>Version 0.1.2</title>
+      <pubDate>Fri, 27 Nov 2026 13:42:15 +0000</pubDate>
+      <sparkle:version>1002</sparkle:version>
+      <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/ipuppyyt/GitWolf/releases/download/v0.1.2/GitWolf-0.1.2.zip" length="3875390" type="application/octet-stream" sparkle:edSignature="Aq7H3NWSZvvUnfuH7iMrt/D6s6CTJt03uvmz2/Vu8I8kaj7RwPAU/r1+j3UnXHYqxlB/85ak1UFqPYN76MwtCw=="/>
+    </item>
+    <item>
       <title>Version 0.1.1</title>
       <pubDate>Fri, 27 Nov 2026 13:28:04 +0000</pubDate>
       <sparkle:version>1001</sparkle:version>
