@@ -277,10 +277,42 @@ public sealed class TrustTests : IDisposable
         await server;
     }
 
-    private static async Task ChallengeAsync(TcpListener listener, StringBuilder requests, CancellationToken token)
+    [Fact]
+    public async Task ARedirectNeverCarriesTheBearerHeaderElsewhere()
     {
-        var reply = "HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"t\"\r\n"u8.ToArray()
-            .Concat("Content-Length: 0\r\nConnection: close\r\n\r\n"u8.ToArray()).ToArray();
+        using var own = new TcpListener(IPAddress.Loopback, 0);
+        using var other = new TcpListener(IPAddress.Loopback, 0);
+        own.Start();
+        other.Start();
+        var ownPort = ((IPEndPoint)own.LocalEndpoint).Port;
+        var ownRequests = new StringBuilder();
+        var otherRequests = new StringBuilder();
+        using var stop = new CancellationTokenSource();
+        var servers = Task.WhenAll(
+            ChallengeAsync(own, ownRequests, stop.Token, $"http://127.0.0.1:{((IPEndPoint)other.LocalEndpoint).Port}"),
+            ChallengeAsync(other, otherRequests, stop.Token));
+
+        var git = await InitAsync(_work);
+        await git.RunAsync(["remote", "add", "origin", $"http://127.0.0.1:{ownPort}/o/r.git"]);
+        var repo = new GitRepository(_work)
+        {
+            Credentials = authority => Task.FromResult<GitCredential?>(
+                new GitCredential(authority, "me", "FAKE-ENTRA") { Scheme = "http", UseBearerHeader = true }),
+            AskpassPath = _askpass,
+        };
+
+        await Assert.ThrowsAsync<GitException>(repo.FetchAsync);
+        await stop.CancelAsync();
+        await servers;
+
+        Assert.Contains("Bearer FAKE-ENTRA", ownRequests.ToString());
+        Assert.DoesNotContain("FAKE-ENTRA", otherRequests.ToString());
+    }
+
+    /// <param name="redirectTo">Answer with a redirect to this server instead of a sign-in challenge.</param>
+    private static async Task ChallengeAsync(
+        TcpListener listener, StringBuilder requests, CancellationToken token, string? redirectTo = null)
+    {
         try
         {
             while (true)
@@ -295,7 +327,13 @@ public sealed class TrustTests : IDisposable
                     length += read;
                     if (Encoding.ASCII.GetString(buffer, 0, length).Contains("\r\n\r\n")) break;
                 }
-                lock (requests) requests.Append(Encoding.ASCII.GetString(buffer, 0, length));
+                var request = Encoding.ASCII.GetString(buffer, 0, length);
+                lock (requests) requests.Append(request);
+                var status = redirectTo is null
+                    ? "401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"t\""
+                    : $"302 Found\r\nLocation: {redirectTo}{request.Split(' ').ElementAtOrDefault(1)}";
+                var reply = Encoding.ASCII.GetBytes(
+                    $"HTTP/1.1 {status}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
                 await stream.WriteAsync(reply, token);
             }
         }

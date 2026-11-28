@@ -96,7 +96,8 @@ jobs:
             echo "| Platform | File |"
             echo "| --- | --- |"
             echo "| macOS 15 or later | \`GitWolf-$VERSION.dmg\` |"
-            echo "| Windows 10 or 11 (x64) | \`GitWolf-$VERSION-windows-x64.zip\` |"
+            echo "| Windows 10 or 11 (x64) | \`GitWolf-$VERSION-windows-x64-setup.exe\` |"
+            echo "| Windows, portable | \`GitWolf-$VERSION-windows-x64.zip\` |"
             echo "| Homebrew | \`brew install --cask ipuppyyt/gitwolf/gitwolf\` |"
             echo
             echo "Installed copies update from inside the app. SHA-256 checksums are the \`.sha256\` files below."
@@ -186,6 +187,20 @@ jobs:
           # unpackaged WinUI app. So the build is shipped, with the published libraries over it.
           Copy-Item "$env:RUNNER_TEMP\publish\*.dll" $out -Force
           Get-ChildItem $out -Recurse -Filter *.pdb | Remove-Item
+          # Most runner images include Inno Setup; the pinned package covers one that doesn't.
+          $findInno = { Get-Item "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" -ErrorAction SilentlyContinue }
+          $iscc = & $findInno
+          if (-not $iscc) {
+            choco install innosetup --version=6.7.1 --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'Inno Setup could not be installed' }
+            $iscc = & $findInno
+          }
+          if (-not $iscc) { throw 'Inno Setup was not found' }
+          $setup = Join-Path $env:RUNNER_TEMP "GitWolf-$env:VERSION-windows-x64-setup.exe"
+          function Build-Installer {
+            & $iscc.FullName /Q "/DAppVersion=$env:VERSION" "/DSourceDir=$out" "/DOutputDir=$env:RUNNER_TEMP" installer\GitWolf.iss
+            if ($LASTEXITCODE -ne 0) { throw 'The installer failed to build' }
+          }
           if ($env:CERT_PFX) {
             $pfx = Join-Path $env:RUNNER_TEMP 'cert.pfx'
             [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERT_PFX))
@@ -203,6 +218,10 @@ jobs:
                 ForEach-Object { Join-Path $out $_ }
               & $signtool.FullName sign /sha1 $certificate.Thumbprint /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $files
               if ($LASTEXITCODE -ne 0) { throw 'Signing failed' }
+              # Built from the signed files, then signed itself.
+              Build-Installer
+              & $signtool.FullName sign /sha1 $certificate.Thumbprint /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $setup
+              if ($LASTEXITCODE -ne 0) { throw 'Signing the installer failed' }
             }
             finally {
               Remove-Item $pfx
@@ -211,10 +230,14 @@ jobs:
           }
           else {
             Write-Output '::warning::No Windows certificate is configured, so the app is not code signed.'
+            Build-Installer
           }
           $zip = Join-Path $env:RUNNER_TEMP "GitWolf-$env:VERSION-windows-x64.zip"
           Compress-Archive -Path "$out\*" -DestinationPath $zip
-          (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower() + "  $(Split-Path $zip -Leaf)" | Set-Content "$zip.sha256" -Encoding ascii
+          foreach ($file in $zip, $setup) {
+            (Get-FileHash $file -Algorithm SHA256).Hash.ToLower() + "  $(Split-Path $file -Leaf)" |
+              Set-Content "$file.sha256" -Encoding ascii
+          }
           dotnet build tools\GitWolf.Release\GitWolf.Release.csproj -c Release --nologo -o (Join-Path $env:RUNNER_TEMP 'tool')
           if ($LASTEXITCODE -ne 0) { throw 'The release tool failed to build' }
       - name: Sign and write the update feed
@@ -232,7 +255,7 @@ jobs:
           dotnet "$TEMP_DIR/tool/GitWolf.Release.dll" "$TEMP_DIR/$ZIP" "$VERSION" \
             "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$ZIP" \
             "$TEMP_DIR/pages/appcast-windows.xml" "$TEMP_DIR/notes.md" "$TEMP_DIR/pages/appcast-windows.xml"
-      # The archive is uploaded before the feed that points to it.
+      # The archive is uploaded before the feed that points to it. The installer is for first installs only.
       - name: Upload to the release
         shell: bash
         env:
@@ -240,7 +263,8 @@ jobs:
         run: |
           TEMP_DIR="$(cygpath -u "$RUNNER_TEMP")"
           ZIP="$TEMP_DIR/GitWolf-$VERSION-windows-x64.zip"
-          gh release upload "$GITHUB_REF_NAME" "$ZIP" "$ZIP.sha256"
+          SETUP="$TEMP_DIR/GitWolf-$VERSION-windows-x64-setup.exe"
+          gh release upload "$GITHUB_REF_NAME" "$ZIP" "$ZIP.sha256" "$SETUP" "$SETUP.sha256"
       - name: Publish the update feed
         shell: bash
         run: |

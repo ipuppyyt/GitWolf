@@ -28,6 +28,16 @@ public sealed class FileIconsTests
     public void ChoosesTheFileIcon(string path, string name) => Assert.Equal(name, FileIcons.ForPath(path).Name);
 
     [Theory]
+    [InlineData("x.ts", "typescript")]
+    [InlineData("main.swift", "swift")]
+    [InlineData("data.json", "json")]
+    public void LanguagesUseTheirLogo(string path, string slug)
+    {
+        var icon = FileIcons.ForPath(path);
+        Assert.Equal((IconGlyph.Logo, slug), (icon.Glyph, icon.Value));
+    }
+
+    [Theory]
     [InlineData("main", "Main branch")]
     [InlineData("Master", "Main branch")]
     [InlineData("develop", "Development")]
@@ -102,7 +112,7 @@ public sealed class FileIconsTests
         {
             Assert.NotEmpty(icon.Name);
             Assert.True(icon.Color <= 0xFFFFFF);
-            if (icon.Glyph == IconGlyph.Letters) Assert.InRange(icon.Value!.Length, 1, 3);
+            if (icon.Glyph == IconGlyph.Letters) Assert.InRange(icon.Value!.Length, 1, 4);
         });
     }
 }

@@ -10,7 +10,7 @@
             <StackPanel>
                 <TextBox x:Name="Query" Margin="12" FontSize="15" PlaceholderText="Jump to a repository, branch or action&#x2026;"
                          TextChanged="OnQuery" PreviewKeyDown="OnKey" />
-                <ListView x:Name="Results" MaxHeight="360" Padding="8,0,8,8" IsItemClickEnabled="True"
+                <ListView x:Name="Results" AutomationProperties.Name="Results" MaxHeight="360" Padding="8,0,8,8" IsItemClickEnabled="True"
                           SelectionMode="Single" ItemClick="OnClick" ContainerContentChanging="OnRow">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

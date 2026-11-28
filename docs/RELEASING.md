@@ -114,7 +114,9 @@ covers certificates held in a file; one kept on a hardware token or cloud servic
 
 | Piece | Where |
 | --- | --- |
-| `GitWolf-<v>-windows-x64.zip` (first install and updates) and `.sha256` | The same GitHub Release |
+| `GitWolf-<v>-windows-x64-setup.exe` (first install) and `.sha256` | The same GitHub Release |
+| `GitWolf-<v>-windows-x64.zip` (updates and portable use) and `.sha256` | The same GitHub Release |
+| Installer script (Inno Setup) | `windows/installer/GitWolf.iss` |
 | The feed (`appcast-windows.xml`, same format as macOS, plain-text notes) | `gh-pages`: `https://ipuppyyt.github.io/GitWolf/appcast-windows.xml` |
 | Signing and feed entry | `windows/tools/GitWolf.Release` |
 
@@ -126,8 +128,13 @@ covers certificates held in a file; one kept on a hardware token or cloud servic
 - Nothing is unpacked until the signature verifies. A release is installed only if its version matches the
   feed and is newer, and the old files are renamed aside so that a failed install is undone.
 - The zip may be unpacked anywhere the user can write to. Files that a new release no longer ships stay behind.
-- First install: unzip to a folder and run `GitWolf.App.exe`. If the program is not Authenticode-signed,
-  Windows SmartScreen asks once (*More info > Run anyway*).
+- First install: run the setup program, or unzip to a folder and run `GitWolf.App.exe`. If they are not
+  Authenticode-signed, Windows SmartScreen asks (*More info > Run anyway*).
+- The installer needs no administrator rights: it installs for the current user into
+  `%LOCALAPPDATA%\Programs\GitWolf`, so in-app updates work. Uninstalling also removes the `gitwolf` command
+  and link registration that point there, and keeps settings.
+- After an in-app update, *Installed apps* still shows the version first installed, and uninstalling leaves any
+  file that only a later release added. The uninstaller itself is not Authenticode-signed.
 
 ## For Linux
 

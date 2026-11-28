@@ -195,6 +195,9 @@ public sealed partial class CommitDetailView : UserControl
     private void OnFileRow(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (!args.InRecycleQueue && args.ItemContainer.ContentTemplateRoot is FileRowView view && args.Item is FileRow row)
+        {
             view.Show(row, null, null);
+            Spoken.Name(args.ItemContainer, Spoken.File(row));
+        }
     }
 }

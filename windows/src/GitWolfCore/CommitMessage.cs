@@ -50,6 +50,89 @@ public static partial class CommitMessage
         return trimmed + gap + line;
     }
 
+    private const string BreakingFooter = "BREAKING CHANGE:";
+
+    /// <summary>Whether the message is marked as breaking, by a `!` or a footer.</summary>
+    public static bool IsBreaking(string message)
+    {
+        var lines = message.Split('\n');
+        return BreakingSubject().IsMatch(lines[0])
+            || lines.Any(l => l.StartsWith(BreakingFooter, StringComparison.Ordinal));
+    }
+
+    /// <summary>Adds or removes the `!` before the colon and the `BREAKING CHANGE:` footer.</summary>
+    public static string SetBreaking(bool breaking, string message)
+    {
+        var lines = message.Split('\n').ToList();
+        var subject = Subject().Match(lines[0]);
+        var marked = BreakingSubject().IsMatch(lines[0]);
+        if (breaking)
+        {
+            if (subject.Success && !marked) lines[0] = lines[0].Insert(subject.Length - 1, "!");
+            if (!lines.Any(l => l.StartsWith(BreakingFooter, StringComparison.Ordinal)))
+            {
+                TrimEnd(lines);
+                lines.AddRange(["", BreakingFooter + " "]);
+            }
+        }
+        else
+        {
+            if (marked) lines[0] = lines[0].Remove(lines[0].IndexOf('!'), 1);
+            lines.RemoveAll(l => l.StartsWith(BreakingFooter, StringComparison.Ordinal));
+            TrimEnd(lines);
+        }
+        return string.Join('\n', lines);
+
+        static void TrimEnd(List<string> all)
+        {
+            while (all.Count > 0 && all[^1].Trim().Length == 0) all.RemoveAt(all.Count - 1);
+        }
+    }
+
+    private static readonly (string Type, string Title)[] ChangelogSections =
+    [
+        ("feat", "Features"), ("fix", "Fixes"), ("perf", "Performance"), ("docs", "Documentation"),
+        ("refactor", "Refactoring"), ("test", "Tests"), ("build", "Build"), ("ci", "CI"), ("style", "Style"),
+        ("chore", "Chores"), ("revert", "Reverts"),
+    ];
+
+    /// <summary>Release notes in Markdown, grouped by conventional commit type.</summary>
+    public static string Changelog(IEnumerable<string> subjects)
+    {
+        var groups = new Dictionary<string, List<string>>();
+        void Add(string title, string line)
+        {
+            if (!groups.TryGetValue(title, out var list)) groups[title] = list = [];
+            list.Add(line);
+        }
+        foreach (var subject in subjects)
+        {
+            var match = Conventional().Match(subject);
+            var title = ChangelogSections.FirstOrDefault(s => s.Type == match.Groups[1].Value).Title;
+            if (!match.Success || title is null)
+            {
+                Add("Other", "- " + subject);
+                continue;
+            }
+            var scope = match.Groups[3].Value;
+            var line = "- " + (scope.Length == 0 ? "" : $"**{scope}:** ") + subject[match.Length..];
+            if (match.Groups[4].Success) Add("Breaking changes", line);
+            Add(title, line);
+        }
+        var order = ChangelogSections.Select(s => s.Title).Prepend("Breaking changes").Append("Other");
+        return string.Join("\n\n", order.Where(groups.ContainsKey)
+            .Select(t => $"### {t}\n{string.Join('\n', groups[t])}"));
+    }
+
+    [GeneratedRegex(@"^[a-z]+(\([^)\n]*\))?!?:")]
+    private static partial Regex Subject();
+
+    [GeneratedRegex(@"^[a-z]+(\([^)\n]*\))?!:")]
+    private static partial Regex BreakingSubject();
+
+    [GeneratedRegex(@"^([a-z]+)(\(([^)\n]*)\))?(!)?:\s*")]
+    private static partial Regex Conventional();
+
     [GeneratedRegex(@"^(Closes|Fixes|Resolves|Refs|Related to) #\d+$")]
     private static partial Regex Reference();
 
@@ -80,6 +163,14 @@ public sealed partial class GitRepository
         {
             return null;
         }
+    }
+
+    /// <summary>Subjects of the commits after <paramref name="since"/>, newest first, without merges.</summary>
+    public async Task<IReadOnlyList<string>> CommitSubjectsAsync(string since)
+    {
+        var output = await Git.RunStringAsync(
+            ["log", "--no-show-signature", "--no-merges", "--format=%s", $"{Operand(since)}..HEAD", "--"], readOnly: true);
+        return output.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(l => l.TrimEnd('\r')).ToList();
     }
 
     /// <summary>Full messages of recent commits, newest first, without duplicates, for reuse.</summary>

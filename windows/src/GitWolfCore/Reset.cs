@@ -20,6 +20,45 @@ public sealed record ReflogEntry(int Index, string Hash, string Message, DateTim
     public string ShortHash => Hash.Length > 7 ? Hash[..7] : Hash;
 }
 
+/// <summary>How to take back the last thing that moved HEAD.</summary>
+public abstract record UndoPlan
+{
+    /// <summary>The commit HEAD must still be at when the plan is carried out.</summary>
+    public required string ExpectedHead { get; init; }
+
+    /// <summary>Move the current branch back to <see cref="Target"/>.</summary>
+    public sealed record Reset(string Target, string Label) : UndoPlan;
+
+    /// <summary>Check out where HEAD was: a branch, or a commit when it was detached.</summary>
+    public sealed record SwitchBack(string To, bool Detached, string From) : UndoPlan;
+
+    private const string CheckoutPrefix = "checkout: moving from ";
+
+    /// <summary>Null when there is nothing to undo. The log is newest first.</summary>
+    public static UndoPlan? For(IReadOnlyList<ReflogEntry> log)
+    {
+        if (log.Count < 2) return null;
+        var newest = log[0];
+        if (newest.Message.StartsWith(CheckoutPrefix, StringComparison.Ordinal))
+        {
+            var move = newest.Message[CheckoutPrefix.Length..];
+            var split = move.LastIndexOf(" to ", StringComparison.Ordinal);
+            if (split <= 0) return null;
+            var from = move[..split];
+            // A detached HEAD is recorded as the full commit hash.
+            var detached = from.Length >= 40 && from.All(char.IsAsciiHexDigit);
+            return new SwitchBack(from, detached, move[(split + 4)..]) { ExpectedHead = newest.Hash };
+        }
+        if (newest.Message.StartsWith("rebase", StringComparison.Ordinal))
+        {
+            // A rebase writes one entry per step; undo all of them at once.
+            var before = log.FirstOrDefault(e => !e.Message.StartsWith("rebase", StringComparison.Ordinal));
+            return before is null ? null : new Reset(before.Hash, "rebase") { ExpectedHead = newest.Hash };
+        }
+        return new Reset(log[1].Hash, newest.Message) { ExpectedHead = newest.Hash };
+    }
+}
+
 /// <summary>What a reset would throw away, so the UI can say so before doing it.</summary>
 public sealed record ResetImpact(int DroppedCommits, int ModifiedFiles);
 
@@ -47,12 +86,23 @@ public sealed partial class GitRepository
     /// Moves back to where HEAD was before its last change, keeping uncommitted work. Refused when
     /// HEAD is no longer at <paramref name="expectedHead"/>, which the user confirmed undoing.
     /// </summary>
-    public async Task UndoAsync(string expectedHead, string target)
+    public async Task UndoAsync(UndoPlan plan)
     {
         var head = (await Git.RunStringAsync(["rev-parse", "HEAD"], readOnly: true)).Trim();
-        if (head != expectedHead)
+        if (head != plan.ExpectedHead)
             throw new GitException("reset", 1, "The repository changed, so nothing was undone. Try again.");
-        await ResetAsync(target, ResetMode.Keep);
+        switch (plan)
+        {
+            case UndoPlan.Reset reset:
+                await ResetAsync(reset.Target, ResetMode.Keep);
+                break;
+            case UndoPlan.SwitchBack { Detached: true } back:
+                await Git.RunAsync(["checkout", "--detach", Operand(back.To), "--"]);
+                break;
+            case UndoPlan.SwitchBack back:
+                await Git.RunAsync(["switch", Operand(back.To)]);
+                break;
+        }
     }
 
     public async Task<ResetImpact> ResetImpactAsync(string target)

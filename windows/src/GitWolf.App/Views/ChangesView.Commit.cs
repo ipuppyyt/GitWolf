@@ -124,6 +124,17 @@ public sealed partial class ChangesView
             }
             menu.Items.Add(reuse);
             if (store.Supports(CollabKind.Issue)) menu.Items.Add(ReferenceMenu(store));
+            var breaking = new ToggleMenuFlyoutItem
+            {
+                Text = "Breaking change",
+                IsChecked = CommitMessage.IsBreaking(Normalize(Message.Text)),
+            };
+            breaking.Click += (_, _) =>
+            {
+                if (ReferenceEquals(store, _store))
+                    Message.Text = CommitMessage.SetBreaking(breaking.IsChecked, Normalize(Message.Text));
+            };
+            menu.Items.Add(breaking);
             menu.ShowAt(anchor);
         }
         catch (Exception error)

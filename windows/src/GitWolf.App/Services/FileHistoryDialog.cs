@@ -39,7 +39,7 @@ internal static class FileHistoryDialog
         foreach (var commit in history)
         {
             var date = commit.Date.LocalDateTime;
-            commits.Items.Add(new StackPanel
+            var item = new StackPanel
             {
                 Padding = new Thickness(0, 4, 0, 4),
                 Children =
@@ -51,8 +51,12 @@ internal static class FileHistoryDialog
                         FontSize = 11.5, Opacity = 0.65, TextTrimming = TextTrimming.CharacterEllipsis,
                     },
                 },
-            });
+            };
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(item,
+                string.Create(CultureInfo.CurrentCulture, $"{commit.Subject}, {commit.AuthorName}, {date:d}"));
+            commits.Items.Add(item);
         }
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(commits, "Commits that changed this file");
         var diff = new ListView { SelectionMode = ListViewSelectionMode.None, ItemContainerStyle = Compact() };
         var open = new Button { Content = "Show in History", IsEnabled = false };
         open.Click += (_, _) => Show(history[commits.SelectedIndex].Hash);
@@ -88,6 +92,8 @@ internal static class FileHistoryDialog
         {
             SelectionMode = ListViewSelectionMode.None, Visibility = Visibility.Collapsed, ItemContainerStyle = Compact(),
         };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(diff, "Changes in this commit");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(blame, "Blame");
         var history_ = new RadioButton { Content = "History", IsChecked = true, MinWidth = 90 };
         var blame_ = new RadioButton { Content = "Blame", MinWidth = 90 };
         var blameLoaded = false;

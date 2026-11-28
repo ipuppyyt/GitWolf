@@ -30,6 +30,9 @@ public sealed partial class RepositoryStore
     public CheckState? HeadChecks =>
         HasProviderAccount && Status.HeadOid is { } head ? Checks(head)?.Overall : null;
 
+    /// <summary>The checked-out commit's run went from running to passed or failed.</summary>
+    public event Action<CheckState>? HeadChecksFinished;
+
     public bool CanPerformCi(CiAction action, CiCheck check) => Account?.Kind.CanPerform(action, check) == true;
 
     public bool IsCiBusy(string sha, CiCheck check) => _ciBusy.Contains((sha, check.Name));
@@ -72,8 +75,12 @@ public sealed partial class RepositoryStore
             var status = await Task.Run(() => client.CiStatusAsync(path, sha));
             if (_lifetime.IsCancellationRequested || generation != _checksGeneration || status.IsEmpty
                 || status.Equals(Checks(sha))) return;
+            var before = Checks(sha)?.Overall;
             _checks[sha] = status;
             Notify(nameof(Checks));
+            if (sha == Status.HeadOid && before == CheckState.Pending
+                && status.Overall is { } after && after is CheckState.Success or CheckState.Failure)
+                HeadChecksFinished?.Invoke(after);
         }
         catch (ProviderException e)
         {
@@ -102,11 +109,13 @@ public sealed partial class RepositoryStore
         var key = (sha, check.Name);
         if (!_ciBusy.Add(key)) return;
         Notify(nameof(Checks));
+        ProviderAccount? account = null;
         try
         {
             if (await ConnectAsync() is not { SignedIn: true } connection)
                 throw ProviderException.Unsupported("Add an account for this repository’s host in Settings → Accounts.");
             var (client, path) = (connection.Client, connection.Path);
+            account = client.Account;
             await Task.Run(() => client.PerformAsync(action, check, path));
             if (_lifetime.IsCancellationRequested) return;
             // Shown as running right away; the lookup a moment later confirms it.
@@ -121,6 +130,7 @@ public sealed partial class RepositoryStore
         catch (ProviderException e)
         {
             ErrorMessage = e.Message;
+            if (e.IsForbidden && account is { UsesOAuth: true }) ReauthAccount = account;
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
         {

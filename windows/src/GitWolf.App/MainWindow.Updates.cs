@@ -18,6 +18,7 @@ public sealed partial class MainWindow
     private void SetUpUpdates()
     {
         Settings.UpdateRequested += () => _ = CheckForUpdatesAsync(manual: true);
+        Settings.AboutRequested += () => _ = AboutDialog.ShowAsync(Root.XamlRoot);
         if (!AppBuild.UpdatesEnabled) return;
         _updater = new Updater(Updater.CreateClient(), AppBuild.Version!);
         // The version that was replaced can only be removed once it has exited.
@@ -144,6 +145,8 @@ public sealed partial class MainWindow
     {
         try
         {
+            // Otherwise the new copy would hand over to this one and exit.
+            ReleaseInstance?.Invoke();
             using var next = Process.Start(new ProcessStartInfo(
                 Path.Combine(AppContext.BaseDirectory, UpdateInstaller.Executable))
             {

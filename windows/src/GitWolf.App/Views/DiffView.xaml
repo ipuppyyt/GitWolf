@@ -57,7 +57,7 @@
                 </Border>
             </StackPanel>
         </Grid>
-        <ListView x:Name="Lines" Grid.Row="1" SelectionMode="None" ContainerContentChanging="OnRow"
+        <ListView x:Name="Lines" AutomationProperties.Name="Diff" Grid.Row="1" SelectionMode="None" ContainerContentChanging="OnRow"
                   ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <ListView.ItemContainerTransitions>
                     <TransitionCollection />
@@ -75,7 +75,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <ListView x:Name="Split" Grid.Row="1" SelectionMode="None" ContainerContentChanging="OnSplitRow">
+        <ListView x:Name="Split" AutomationProperties.Name="Diff, side by side" Grid.Row="1" SelectionMode="None" ContainerContentChanging="OnSplitRow">
                 <ListView.ItemContainerTransitions>
                     <TransitionCollection />
                 </ListView.ItemContainerTransitions>

@@ -55,12 +55,13 @@ public sealed partial class MainWindow : Window
         Diff.ShowOptions(_settings.State.IgnoreWhitespace, _settings.State.FullFileDiffs);
         Diff.OptionsChanged += (ignore, whole) =>
             _settings.Update(_settings.State with { IgnoreWhitespace = ignore, FullFileDiffs = whole });
-        Root.ActualThemeChanged += (_, _) => Theming.UpdateCaptionButtons(this, Root.ActualTheme);
+        Root.ActualThemeChanged += (_, _) => Theming.ThemeChanged(this, _settings.State);
         Root.Loaded += (_, _) => Theming.Apply(this, _settings.State);
         AddShortcuts();
         AttachProvider();
         SetUpUpdates();
         SetUpOpenIn();
+        SetUpShell();
 
         Activated += (_, e) =>
         {
@@ -80,24 +81,6 @@ public sealed partial class MainWindow : Window
         // Starts over when something else is copied before it has faded.
         Dialogs.Copied += () => ShowNotice("Copied");
         Bind();
-    }
-
-    /// <summary>Restores the last session, then opens and selects the folder given on the command line.</summary>
-    internal async Task StartAsync(string? path)
-    {
-        try
-        {
-            // Restore first: opening saves the list, which would otherwise replace the saved one.
-            await _workspace.RestoreAsync();
-            Diff.IsSplit = _workspace.SplitDiff;
-            if (path is not null) await OpenAsync(path);
-        }
-        catch (Exception e)
-        {
-            // Fire-and-forget from launch: report rather than lose the failure.
-            Trace.TraceError($"Startup failed: {e.GetType().Name}");
-            ShowError("The last session couldn’t be restored.");
-        }
     }
 
     private async Task OpenAsync(string path)
@@ -150,8 +133,11 @@ public sealed partial class MainWindow : Window
         var window = WinRT.Interop.WindowNative.GetWindowHandle(this);
         var git = _settings.CustomGitPath;
         var folder = clone
-            ? await CreateDialogs.CloneAsync(Root.XamlRoot, window, git, _settings.Accounts)
+            ? await CreateDialogs.CloneAsync(
+                Root.XamlRoot, window, git, _settings.Accounts, _settings.State.CloneFolder)
             : await CreateDialogs.NewAsync(Root.XamlRoot, window, git);
+        if (clone && folder is not null && Path.GetDirectoryName(folder) is { } parent)
+            _settings.Update(_settings.State with { CloneFolder = parent });
         if (folder is not null) await OpenAllAsync([folder]);
     }
 
@@ -240,7 +226,7 @@ public sealed partial class MainWindow : Window
         var store = _store;
         var loaded = store?.IsLoaded == true;
         Home.Visibility = When(store is null);
-        if (store is null) Dashboard.Show(_workspace.Recents);
+        if (store is null) Dashboard.Show(_workspace);
         Repository.Visibility = When(loaded);
         Loading.IsActive = store is { Untrusted: null } && !loaded;
         SetTitleBar(loaded ? (UIElement)TopBar.DragRegion : HomeDragArea);
@@ -394,6 +380,9 @@ public sealed partial class MainWindow : Window
             case nameof(RepositoryStore.ErrorMessage):
                 ShowError(store.ErrorMessage);
                 break;
+            case nameof(RepositoryStore.ReauthAccount):
+                ShowReauth();
+                break;
             case nameof(RepositoryStore.Comparison):
                 Compare.Show(store);
                 break;
@@ -453,70 +442,6 @@ public sealed partial class MainWindow : Window
     /// <summary>The selected repository when it can take a new operation.</summary>
     private RepositoryStore? Idle => _store is { IsLoaded: true, IsBusy: false } store ? store : null;
 
-    private void OpenPalette()
-    {
-        var items = _workspace.Repos
-            .Select(r => new PaletteItem(Icons.File, r.Name, "Switch repository", () => _workspace.Select(r)))
-            .ToList();
-        if (Idle is { } s)
-        {
-            void Add(Icons.Shape glyph, string title, string subtitle, Action run) =>
-                items.Add(new PaletteItem(glyph, title, subtitle, run));
-            if (s.Operation is { } operation)
-            {
-                var verb = operation.Verb.ToLowerInvariant();
-                if (s.Status.Conflicted.Count == 0)
-                    Add(Icons.Changes, $"Continue {verb}", "Repository action", () => _ = s.ContinueOperationAsync());
-                Add(Icons.Changes, $"Abort {verb}\u2026", "Repository action",
-                    () => _ = Dialogs.AbortAsync(Root.XamlRoot, s, operation));
-            }
-            Add(Icons.Fetch, "Fetch", "Repository action", () => _ = s.FetchAsync());
-            Add(Icons.Pull, "Pull", "Repository action", () => _ = s.PullAsync());
-            Add(Icons.Push, "Push", "Repository action", () => _ = s.PushAsync());
-            AddSyncItems(items, s);
-            Add(Icons.Plus, "New branch…", "Repository action",
-                () => _ = Dialogs.NewBranchAsync(Root.XamlRoot, s, null));
-            Add(Icons.Branch, "Clean up branches\u2026", "Repository action",
-                () => _ = BranchDialogs.CleanupAsync(Root.XamlRoot, s));
-            Add(Icons.Branch, "Worktrees & submodules\u2026", "Repository action",
-                () => _ = CheckoutDialog.ShowAsync(Root.XamlRoot, s, WindowHandle, path => _ = OpenAsync(path)));
-            Add(Icons.File, "Apply patch\u2026", "Repository action",
-                () => _ = ToolDialogs.ApplyPatchesAsync(Root.XamlRoot, s, WindowHandle));
-            Add(Icons.File, "Create patch from changes\u2026", "Repository action",
-                () => _ = ToolDialogs.SavePatchAsync(s, WindowHandle));
-            if (s.Bisect.IsActive)
-                Add(Icons.History, "Stop bisect", "Repository action", () => _ = s.StopBisectAsync());
-            if (s.IsShallow)
-                Add(Icons.Fetch, "Fetch full history", "Sync", () => _ = s.UnshallowAsync());
-            Add(Icons.Branch, "Compare refs\u2026", "Repository action", () => _ = s.OpenCompareAsync());
-            Add(Icons.History, "Reflog\u2026", "Repository action",
-                () => _ = HistoryDialogs.ReflogAsync(Root.XamlRoot, s));
-            Add(Icons.History, "Undo last change\u2026", "Repository action",
-                () => _ = HistoryDialogs.UndoAsync(Root.XamlRoot, s));
-            Add(Icons.History, "Show history", "View", () => s.Mode = StoreMode.History);
-            Add(Icons.Changes, "Show changes", "View", () => s.Mode = StoreMode.Changes);
-            if (s.WebLinks is not null)
-            {
-                var site = s.ProviderTitle ?? "the web";
-                Add(Icons.OpenLink, $"Open on {site}", "Repository action", () => s.OpenOnWeb(new WebTarget.Repository()));
-                Add(Icons.OpenLink, $"Open branch on {site}", "Repository action", () => s.OpenOnWeb(new WebTarget.Branch()));
-                Add(Icons.OpenLink, $"Create pull request on {site}", "Repository action",
-                    () => s.OpenOnWeb(new WebTarget.PullRequest()));
-            }
-            AddProviderItems(items, s);
-            foreach (var branch in s.LocalBranches.Where(b => !b.IsCurrent))
-                Add(Icons.Branch, branch.Name, "Check out branch", () => _ = s.CheckoutAsync(branch));
-        }
-        AddOpenInItems(items);
-        items.Add(new PaletteItem(Icons.Plus, "Open repository…", "Workspace", () => _ = PickAsync()));
-        items.Add(new PaletteItem(Icons.Plus, "Clone repository\u2026", "Workspace", () => _ = CreateAsync(clone: true)));
-        items.Add(new PaletteItem(Icons.Plus, "New repository\u2026", "Workspace", () => _ = CreateAsync(clone: false)));
-        items.Add(new PaletteItem(Icons.Plus, "Settings\u2026", "App", Settings.Open));
-        items.Add(new PaletteItem(Icons.Fetch, "Check for Updates\u2026", "App",
-            () => _ = CheckForUpdatesAsync(manual: true)));
-        CommandPalette.Open(items);
-    }
-
     private void OnSettingsChanged(SettingsState old, SettingsState now)
     {
         if (old.Appearance != now.Appearance || old.Accent != now.Accent)
@@ -543,6 +468,7 @@ public sealed partial class MainWindow : Window
         ErrorText.Text = message ?? "";
         // A new message starts from its first line.
         ErrorScroller.ChangeView(null, 0, null, true);
+        ShowReauth();
         Error.IsOpen = message is not null;
     }
 

@@ -49,6 +49,7 @@ public sealed partial class StashView : UserControl
         _apply.Click += (_, _) => _ = ActAsync((s, reference) => s.StashApplyAsync(reference));
         _pop.Click += (_, _) => _ = ActAsync((s, reference) => s.StashPopAsync(reference));
         _drop.Click += (_, _) => _ = DropAsync();
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(_list, "Files in this stash");
         _list.ContainerContentChanging += OnRow;
         _list.SelectionChanged += OnSelected;
 
@@ -133,9 +134,11 @@ public sealed partial class StashView : UserControl
             var view = new FileRowView();
             view.Show(file, null, null);
             host.Content = view;
+            Spoken.Name(args.ItemContainer, Spoken.File(file));
         }
         else
         {
+            Spoken.Name(args.ItemContainer, row.Heading ?? "");
             host.Content = new TextBlock
             {
                 Text = row.Heading ?? "", FontSize = 11.5, Opacity = 0.65, Margin = new Thickness(0, 10, 0, 2),

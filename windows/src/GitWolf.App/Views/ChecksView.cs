@@ -1,3 +1,4 @@
+using GitWolf.App.Services;
 using GitWolf.Core;
 using GitWolf.Store;
 using Microsoft.UI.Xaml;
@@ -74,7 +75,7 @@ public sealed class ChecksView : UserControl
         if (offset > 0) scroller.Loaded += (_, _) => scroller.ChangeView(null, offset, null, true);
     }
 
-    private static Grid Row(RepositoryStore store, string sha, CiCheck check)
+    private Grid Row(RepositoryStore store, string sha, CiCheck check)
     {
         var row = new Grid
         {
@@ -103,7 +104,7 @@ public sealed class ChecksView : UserControl
             };
             ToolTipService.SetToolTip(button, rerun ? "Re-run this check" : "Cancel this run");
             AutomationProperties.SetName(button, $"{(rerun ? "Re-run" : "Cancel")} {check.Name}");
-            button.Click += (_, _) => _ = store.PerformCiAsync(action, sha, check);
+            button.Click += (_, _) => _ = PerformAsync(store, action, sha, check);
             Grid.SetColumn(button, 2);
             row.Children.Add(button);
         }
@@ -131,4 +132,13 @@ public sealed class ChecksView : UserControl
             Glyph = Ui.CheckGlyph(state), FontSize = 12, Foreground = Ui.CheckBrush(state),
             VerticalAlignment = VerticalAlignment.Center,
         };
+
+    /// <summary>Cancelling stops every job in the run, so it is asked about first.</summary>
+    private async Task PerformAsync(RepositoryStore store, CiAction action, string sha, CiCheck check)
+    {
+        if (action == CiAction.Cancel && !await Dialogs.ConfirmAsync(XamlRoot, $"Cancel the run for “{check.Name}”?",
+                "Other checks in the same run are stopped too.", "Cancel run"))
+            return;
+        await store.PerformCiAsync(action, sha, check);
+    }
 }

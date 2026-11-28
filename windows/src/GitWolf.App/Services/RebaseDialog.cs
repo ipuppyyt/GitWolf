@@ -45,6 +45,7 @@ internal static class RebaseDialog
             MaxHeight = Math.Clamp(root.Size.Height - 360, 180, 520),
             SelectionMode = ListViewSelectionMode.Single,
         };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(list, "Commits to rebase");
         var problem = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12.5 };
         var dialog = new ContentDialog
         {

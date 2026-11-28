@@ -21,6 +21,12 @@ public sealed class ProviderException(string message, int? status = null) : Exce
 
     public bool IsUnauthorized => Status is 401 or 403;
 
+    /// <summary>A change refused for lack of permission. Signing in again can fix it for a browser sign-in.</summary>
+    public bool IsForbidden { get; private init; }
+
+    public static ProviderException Forbidden(int code, string reason) =>
+        new($"{reason.TrimEnd('.')}. This account may not be allowed to do that.", code) { IsForbidden = true };
+
     public static ProviderException Unauthorized =>
         new("The server rejected this token. Check that it is valid and has repository access.", 401);
 
@@ -164,6 +170,9 @@ public sealed partial class ProviderClient
         }
         var code = (int)status;
         if (code is >= 200 and < 300) return body;
+        // A refused write says why, which is what the user needs: reading can work while changing isn't allowed.
+        if (!isRead && code is 401 or 403 && ErrorMessage(body) is { } reason)
+            throw ProviderException.Forbidden(code, reason);
         if (code == 401) throw ProviderException.Unauthorized;
         // Writes report the server's own reason; reads keep plain codes so callers can react to 404.
         if (!isRead && ErrorMessage(body) is { } message) throw new ProviderException(message, code);
