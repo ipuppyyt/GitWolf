@@ -99,9 +99,11 @@ struct AccountsSettings: View {
 struct AddAccountSheet: View {
     enum Method: Hashable { case browser, token, password }
 
+
     @Environment(\.dismiss) private var dismiss
     @State private var kind = ProviderKind.github
     @State private var host = ProviderKind.github.defaultHost
+    @State private var selfHosted = false
     @State private var username = ""
     @State private var token = ""
     @State private var method = Method.browser
@@ -122,11 +124,14 @@ struct AddAccountSheet: View {
     private var scheme: String? {
         host.trimmingCharacters(in: .whitespaces).lowercased().hasPrefix("http://") ? "http" : nil
     }
-    private var hostHidden: Bool {
-        kind != .gitea && OAuthClients.hasBuiltIn(host: kind.defaultHost) && cleanHost == kind.defaultHost
-    }
+    private var hostHidden: Bool { !selfHosted }
     private var oauthAvailable: Bool { kind.oauthFlow != nil && kind.supportsOAuth(host: cleanHost) }
-    private var effectiveMethod: Method { method == .browser && !oauthAvailable ? .token : method }
+    private var passwordAllowed: Bool { kind != .github && kind != .gitlab }
+    private var effectiveMethod: Method {
+        if method == .browser && !oauthAvailable { return .token }
+        if method == .password && !passwordAllowed { return oauthAvailable ? .browser : .token }
+        return method
+    }
     private var needsClientID: Bool { effectiveMethod == .browser && !OAuthClients.hasBuiltIn(host: cleanHost) }
     private var resolvedClientID: String {
         let typed = clientID.trimmingCharacters(in: .whitespaces)
@@ -150,21 +155,23 @@ struct AddAccountSheet: View {
 
             HStack(spacing: 8) {
                 ForEach(ProviderKind.allCases) { item in
+                    let selected = kind == item
                     Button {
                         kind = item
-                        if host.isEmpty || ProviderKind.allCases.contains(where: { $0.defaultHost == host }) { host = item.defaultHost }
+                        if !item.hasSelfHosted { selfHosted = false }
+                        host = selfHosted ? "" : item.defaultHost
                         error = nil
                     } label: {
                         VStack(spacing: 5) {
                             ProviderTile(kind: item, size: 34)
-                            Text(item == .gitea ? "Gitea" : item == .azure ? "Azure DevOps" : item.title)
+                            Text(item == .azure ? "Azure DevOps" : item == .gitea ? "Gitea" : item.title)
                                 .font(.caption2).lineLimit(1)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 8)
-                        .background(kind == item ? Theme.brand.opacity(0.14) : Color.primary.opacity(0.04),
+                        .background(selected ? Theme.brand.opacity(0.14) : Color.primary.opacity(0.04),
                                     in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .strokeBorder(kind == item ? Theme.brand.opacity(0.6) : .clear))
+                            .strokeBorder(selected ? Theme.brand.opacity(0.6) : .clear))
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -172,25 +179,17 @@ struct AddAccountSheet: View {
                 }
             }
 
-            Picker("", selection: Binding(get: { effectiveMethod }, set: { method = $0; error = nil })) {
-                if oauthAvailable { Text("Browser").tag(Method.browser) }
-                Text("Token").tag(Method.token)
-                Text("Password").tag(Method.password)
+            if kind.hasSelfHosted {
+                Toggle("Self-hosted server", isOn: Binding(get: { selfHosted }, set: { selfHosted = $0; host = $0 ? "" : kind.defaultHost; error = nil }))
+                    .toggleStyle(.switch).controlSize(.small).disabled(session.isActive)
             }
-            .pickerStyle(.segmented).labelsHidden().disabled(session.isActive)
 
             if !hostHidden {
                 field("HOST") {
-                    TextField(kind.defaultHost, text: $host).textFieldStyle(.plain)
+                    TextField("git.company.com", text: $host).textFieldStyle(.plain)
                         .disabled(session.isActive)
-                        .onChange(of: host) { _, value in
-                            // Enterprise / self-managed servers: pick the provider from the hostname.
-                            var h = value.lowercased()
-                            for p in ["https://", "http://"] where h.hasPrefix(p) { h.removeFirst(p.count) }
-                            if let guessed = ProviderKind.guess(host: h), guessed != kind { kind = guessed }
-                        }
                 }
-                Text(verbatim: "For GitHub Enterprise, GitLab self-managed, Gitea or Bitbucket Data Center, enter your server, e.g. git.company.com or https://git.company.com:8443.")
+                Text(verbatim: "Your server, e.g. git.company.com or https://git.company.com:8443.")
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
 
@@ -205,7 +204,16 @@ struct AddAccountSheet: View {
             if let error { Text(error).font(.callout).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
 
             HStack {
-                if working { ProgressView().controlSize(.small); Text("Verifying…").font(.caption).foregroundStyle(.secondary) }
+                if working {
+                    ProgressView().controlSize(.small); Text("Verifying…").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    Picker("Sign in with", selection: Binding(get: { effectiveMethod }, set: { method = $0; error = nil })) {
+                        if oauthAvailable { Text("Browser").tag(Method.browser) }
+                        Text("Token").tag(Method.token)
+                        if passwordAllowed { Text("Password").tag(Method.password) }
+                    }
+                    .pickerStyle(.menu).fixedSize().disabled(session.isActive)
+                }
                 Spacer()
                 Button("Cancel", role: .cancel) { session.cancel(); dismiss() }.keyboardShortcut(.cancelAction)
                 if effectiveMethod == .browser {
@@ -297,7 +305,7 @@ struct AddAccountSheet: View {
             SecureField("Paste here", text: $token).textFieldStyle(.plain).onSubmit(add)
         }
         VStack(alignment: .leading, spacing: 4) {
-            Text(password ? "Many hosts (GitHub, GitLab) no longer accept passwords for Git over HTTPS; use a token there."
+            Text(password ? "Some hosts no longer accept passwords for Git over HTTPS; use a token there."
                           : kind.scopeHint).font(.caption).foregroundStyle(.secondary)
             if !password, let link = kind.tokenPageURL(host: cleanHost) {
                 Button("Create a \(kind.secretName.lowercased()) on \(cleanHost) ↗") { NSWorkspace.shared.open(link) }
@@ -364,12 +372,8 @@ struct AddAccountSheet: View {
         Task {
             do {
                 if kind.supportsRepositoryListing {
-                    do {
-                        let login = try await ProviderClient(account: account, token: secret).currentUser()
-                        if !kind.needsUsername && !password { account.username = login }
-                    } catch ProviderError.unauthorized where password && (kind == .github || kind == .gitlab) {
-                        // These APIs reject passwords; Git itself may still accept them, so keep the account.
-                    }
+                    let login = try await ProviderClient(account: account, token: secret).currentUser()
+                    if !kind.needsUsername && !password { account.username = login }
                 } else if account.username.isEmpty {
                     account.username = "git"
                 }
@@ -381,4 +385,8 @@ struct AddAccountSheet: View {
             }
         }
     }
+}
+
+private extension ProviderKind {
+    var hasSelfHosted: Bool { self != .azure }
 }
