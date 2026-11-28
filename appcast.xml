@@ -6,6 +6,28 @@
     <description>GitWolf updates</description>
     <language>en</language>
     <item>
+      <title>Version 0.2.4</title>
+      <pubDate>Sat, 28 Nov 2026 07:31:30 +0000</pubDate>
+      <sparkle:version>2004</sparkle:version>
+      <sparkle:shortVersionString>0.2.4</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<pre style="font-family: -apple-system, sans-serif; white-space: pre-wrap;">
+### Added (macOS)
+- **Notarised by Apple:** the app and disk image are signed with a Developer ID, so a first install opens without the *Open Anyway* step.
+- **Language logos:** files show the logo of their language or tool (about 100, from Simple Icons) in its brand colour, with lettered tiles where no logo exists. Many more extensions and file names are recognised.
+- **Filter the Changes list:** a search box appears once more than 20 files have changed. Stage All and Unstage All become *Stage Shown* and *Unstage Shown* while a filter is active.
+
+### Added (Windows)
+- **Repository icons:** right-click a tile and choose *Change icon…* for a symbol, a tile colour or a picture, or drop a picture on the tile. Pictures are stored in the app's data folder, never in the repository. (Thanks to Rage-Gaming.)
+- The app and taskbar now use the wolf icon.
+
+### Changed
+- The website has a working demo window of the app on Mac and Windows, and no navigation bar.
+
+</pre>]]></description>
+      <enclosure url="https://github.com/ipuppyyt/GitWolf/releases/download/v0.2.4/GitWolf-0.2.4.zip" length="4453565" type="application/octet-stream" sparkle:edSignature="xnjDlTGHmUvwmKe7orHktnImWSEGw2N6eSeGgXHR2XSJgNEGYt0cnwZ7NDgRFEatkgcF9CVg2H7mvypOUv5MBQ=="/>
+    </item>
+    <item>
       <title>Version 0.2.0</title>
       <pubDate>Sat, 28 Nov 2026 02:28:26 +0000</pubDate>
       <sparkle:version>2000</sparkle:version>
