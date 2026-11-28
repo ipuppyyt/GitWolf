@@ -1,4 +1,0 @@
-module GitWolfPackageTests {
-    header "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/GitWolfPackageTests-Swift.h"
-    requires objc
-}

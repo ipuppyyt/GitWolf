@@ -1,4 +1,0 @@
-module GitWolfCore {
-    header "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitWolfCore-Swift.h"
-    requires objc
-}
