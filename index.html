@@ -3,84 +3,366 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GitWolf: a fast, native Git client for Mac</title>
-<meta name="description" content="GitWolf is an open-source Git client for macOS. Native, fast, always in sync, and it uses the Git you already have.">
-<meta property="og:title" content="GitWolf">
-<meta property="og:description" content="A fast, native, open-source Git client for Mac.">
+<title>GitWolf: a fast, native Git client for Mac and Windows</title>
+<meta name="description" content="GitWolf is a free, open-source Git client for Mac and Windows. Native, always in sync, stage by line, interactive rebase, pull requests and CI results. It uses the Git you already have.">
+<link rel="canonical" href="https://ipuppyyt.github.io/GitWolf/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#012aa5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0d13" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="gitwolf-icon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GitWolf">
+<meta property="og:title" content="GitWolf: a fast, native Git client for Mac and Windows">
+<meta property="og:description" content="Free and open source. Native, always in sync, with line staging, rebase, pull requests and CI results.">
+<meta property="og:url" content="https://ipuppyyt.github.io/GitWolf/">
+<meta property="og:image" content="https://ipuppyyt.github.io/GitWolf/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="The GitWolf wolf logo in white on a blue background, with the words GitWolf, a fast, native Git client for Mac">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GitWolf: a fast, native Git client">
+<meta name="twitter:description" content="Free and open source. Native, always in sync, with line staging, rebase, pull requests and CI results.">
+<meta name="twitter:image" content="https://ipuppyyt.github.io/GitWolf/social-preview.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "GitWolf",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "macOS 15 or later, Windows 10 or later",
+      "description": "A fast, native, open-source Git client for Mac and Windows.",
+      "url": "https://ipuppyyt.github.io/GitWolf/",
+      "downloadUrl": "https://github.com/ipuppyyt/GitWolf/releases/latest",
+      "image": "https://ipuppyyt.github.io/GitWolf/social-preview.png",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "sameAs": ["https://github.com/ipuppyyt/GitWolf"]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is GitWolf free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. GitWolf is free and open source under the MIT licence." } },
+        { "@type": "Question", "name": "Does GitWolf replace Git?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. GitWolf runs the Git that is already installed on your computer, so your configuration, hooks and credentials behave exactly as they do in a terminal." } },
+        { "@type": "Question", "name": "Which hosting services does GitWolf work with?",
+          "acceptedAnswer": { "@type": "Answer", "text": "GitHub, GitLab, Bitbucket, Gitea and Forgejo (including Codeberg) and Azure DevOps, cloud or self-hosted. You can clone, open pull requests and see CI results." } },
+        { "@type": "Question", "name": "Why does macOS say it cannot verify GitWolf?",
+          "acceptedAnswer": { "@type": "Answer", "text": "GitWolf is not notarised, because notarisation needs a paid Apple Developer account. Open System Settings, Privacy and Security, and choose Open Anyway once. Installing with Homebrew skips this step. Updates installed from inside the app never ask." } },
+        { "@type": "Question", "name": "Is there a Linux version?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Not yet. GitWolf is built natively for each platform, and a Linux client is planned." } }
+      ]
+    }
+  ]
+}
+</script>
+
 <style>
-  :root { --bg:#ffffff; --surface:#f4f5f8; --text:#14171f; --muted:#5b6272; --line:#e1e4ea; --brand:#012aa5; --on-brand:#ffffff; }
+  :root {
+    --canvas: #eceef4; --surface: #ffffff; --text: #14171f; --muted: #5d6475;
+    --brand: #012aa5; --on-brand: #ffffff;
+    --line: color-mix(in srgb, var(--text) 11%, transparent);
+    --hover: color-mix(in srgb, var(--text) 5.5%, transparent);
+    --select: color-mix(in srgb, var(--brand) 16%, transparent);
+    --shadow: 0 10px 30px rgba(20, 23, 31, .10);
+    --green: #28a745; --orange: #f08c1a; --red: #e5484d; --blue: #2f6bff; --teal: #17a398;
+    --l1: #5c85ff; --l2: #bd61f5; --l3: #fa669e; --l4: #ff9e40; --l5: #2ec2b8; --l6: #4dcc73;
+    --radius: 16px;
+  }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#0f1117; --surface:#181b24; --text:#eceef3; --muted:#9aa1b2; --line:#272b37; --brand:#3366ff; }
+    :root {
+      --canvas: #0b0d13; --surface: #151821; --text: #eceef4; --muted: #99a0b2; --brand: #3366ff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+    }
   }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
-  main { max-width: 860px; margin: 0 auto; padding: 0 20px 64px; }
-  header { text-align:center; padding: 72px 0 40px; }
-  header img { width: 112px; height: 112px; }
-  h1 { font-size: 44px; margin: 18px 0 6px; letter-spacing: -0.02em; }
-  .tag { font-size: 20px; color: var(--muted); margin: 0 auto; max-width: 560px; }
-  .actions { margin-top: 28px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  a.button { display:inline-block; padding: 11px 22px; border-radius: 10px; font-weight:600; text-decoration:none; background:var(--brand); color:var(--on-brand); }
-  a.button.secondary { background:transparent; color:var(--text); border:1px solid var(--line); }
-  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
-  pre { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow-x:auto; margin: 12px 0; }
-  h2 { font-size: 24px; margin: 48px 0 12px; letter-spacing: -0.01em; }
-  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding: 16px 18px; }
-  .card h3 { margin:0 0 4px; font-size:16px; }
-  .card p { margin:0; color:var(--muted); font-size:15px; }
-  ol { padding-left: 22px; } li { margin: 6px 0; }
-  a { color: var(--brand); }
-  footer { color:var(--muted); font-size:14px; text-align:center; padding: 32px 20px 48px; border-top:1px solid var(--line); }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--canvas); color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--brand); text-underline-offset: 3px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--brand); color: var(--on-brand); padding: 8px 14px; border-radius: 10px; z-index: 10; }
+  .skip:focus { left: 8px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  .rounded { font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; }
+  code, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+  .label { font-size: 10.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+  /* Top bar: a capsule, like the app's pills */
+  .bar { position: sticky; top: 12px; z-index: 5; margin: 12px auto 0; max-width: 1040px; padding: 0 20px; }
+  .bar nav { display: flex; align-items: center; gap: 4px; background: color-mix(in srgb, var(--surface) 92%, transparent);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px 6px 14px; box-shadow: var(--shadow); }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; color: var(--text); text-decoration: none; margin-right: auto; }
+  .brand img { width: 26px; height: 26px; border-radius: 7px; }
+  .bar a.link { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px; font-size: 14px; font-weight: 500; }
+  .bar a.link:hover { background: var(--hover); color: var(--text); }
+  .pill { background: var(--brand); color: var(--on-brand) !important; font-weight: 600 !important; }
+  .pill:hover { background: var(--brand) !important; opacity: .9; }
+  @media (max-width: 640px) { .bar a.link:not(.pill) { display: none; } }
+
+  /* Hero */
+  .hero { text-align: center; padding: 72px 0 36px; }
+  .hero h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.08; letter-spacing: -.025em; margin: 0 auto 16px; max-width: 760px; font-weight: 700; }
+  .hero h1 span { color: var(--brand); }
+  .lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 640px; margin: 0 auto; }
+  .cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 12px; font-weight: 600; text-decoration: none;
+    background: var(--brand); color: var(--on-brand); border: 1px solid transparent; transition: transform .15s ease, opacity .15s ease; }
+  .btn:hover { transform: translateY(-1px); opacity: .92; }
+  .btn.quiet { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn.quiet:hover { background: var(--hover); }
+  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 22px 0 0; padding: 0; list-style: none; }
+  .chips li { border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 13px; color: var(--muted); background: var(--surface); }
+
+  /* The app, drawn in HTML and CSS */
+  .stage { margin: 28px auto 0; max-width: 940px; padding: 10px; border-radius: 22px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+  .app { display: grid; grid-template-columns: 52px 168px 1fr 1.05fr; gap: 8px; height: 392px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; min-width: 0; }
+  .rail { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0; }
+  .tile { position: relative; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 13px; font-weight: 700;
+    background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+  .tile.on { background: var(--c); color: #fff; }
+  .tile.on::before { content: ""; position: absolute; left: -9px; top: 9px; width: 3px; height: 18px; border-radius: 2px; background: var(--c); }
+  .badge { position: absolute; right: -4px; bottom: -4px; width: 15px; height: 15px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; }
+  .ok { width: 11px; height: 11px; border-radius: 50%; background: var(--green); }
+  .spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--orange) 30%, transparent); border-top-color: var(--orange); animation: spin 1s linear infinite; }
+  .side { padding: 12px 8px; font-size: 13px; }
+  .row { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 9px; border-radius: 10px; white-space: nowrap; overflow: hidden; }
+  .row.sel { background: var(--select); font-weight: 600; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .hist { padding: 6px 0; }
+  .commit { position: relative; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; height: 50px; padding: 0 12px 0 0;
+    font-size: 13px; animation: slide .6s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i) * 110ms + 250ms); }
+  .commit.sel { background: var(--select); margin: 0 6px; border-radius: 10px; padding-right: 8px; }
+  .commit b { font-weight: 600; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .commit small { color: var(--muted); font-size: 11.5px; }
+  .graph { position: relative; height: 100%; }
+  .graph::before { content: ""; position: absolute; left: 14px; top: 0; bottom: 0; width: 2px; background: var(--l1); transform-origin: top; animation: grow .9s ease both; animation-delay: calc(var(--i) * 110ms + 300ms); }
+  .graph.l2::after { content: ""; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: var(--l2); }
+  .graph i { position: absolute; left: 9px; top: 20px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 3px solid var(--l1); z-index: 1; }
+  .graph.l2 i { left: 23px; border-color: var(--l2); }
+  .hash { position: relative; display: inline-grid; font: 600 11px ui-monospace, Menlo, monospace; border-radius: 999px; padding: 2px 9px; background: var(--hover); color: var(--muted); min-width: 66px; text-align: center; }
+  .hash span { grid-area: 1 / 1; }
+  .hash .a { animation: swapA 6s ease-in-out infinite; }
+  .hash .b { color: var(--green); font-family: -apple-system, system-ui, sans-serif; animation: swapB 6s ease-in-out infinite; }
+  .detail { padding: 12px; font: 12px/1.7 ui-monospace, Menlo, monospace; display: flex; flex-direction: column; gap: 10px; }
+  .detail h3 { margin: 0; font: 600 13px -apple-system, system-ui, sans-serif; }
+  .files { display: flex; gap: 6px; flex-wrap: wrap; font-family: -apple-system, system-ui, sans-serif; }
+  .files span { font-size: 11.5px; border-radius: 999px; padding: 1px 9px; background: var(--hover); }
+  .ln { display: block; padding: 0 8px; border-radius: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: fade .5s ease both; animation-delay: calc(var(--i) * 90ms + 900ms); }
+  .ln.add { background: color-mix(in srgb, var(--green) 15%, transparent); }
+  .ln.del { background: color-mix(in srgb, var(--red) 15%, transparent); }
+  .ln.ctx { color: var(--muted); }
+  .caption { text-align: center; color: var(--muted); font-size: 14px; margin: 18px 0 0; }
+  @media (max-width: 860px) { .app { grid-template-columns: 52px 1fr; height: 330px; } .side, .detail { display: none; } }
+
+  /* Sections */
+  section { padding: 56px 0 8px; }
+  h2 { font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.02em; line-height: 1.2; margin: 0 0 8px; font-weight: 700; }
+  .sub { color: var(--muted); margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; transition: transform .2s ease, border-color .2s ease; }
+  .card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--brand) 40%, transparent); }
+  .card h3 { margin: 12px 0 4px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 16%, transparent); }
+  .icon svg { width: 20px; height: 20px; stroke: var(--c); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .panel.pad { padding: 22px; box-shadow: none; }
+  .panel.pad h3 { margin: 0 0 6px; font-size: 18px; }
+  .panel.pad p { margin: 6px 0; color: var(--muted); font-size: 15px; }
+  pre { margin: 12px 0 0; background: var(--hover); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; overflow-x: auto; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  pre code { user-select: all; }
+  ol { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 15px; } li { margin: 4px 0; }
+
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; margin: 0 0 8px; }
+  summary { cursor: pointer; font-weight: 600; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--muted); font-weight: 400; font-size: 20px; line-height: 1; transition: transform .2s ease; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { margin: 0 0 16px; color: var(--muted); }
+
+  footer { margin-top: 72px; border-top: 1px solid var(--line); padding: 32px 0 56px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer a { color: var(--muted); }
+
+  /* Motion: CSS only, and off when asked */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes slide { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes swapA { 0%, 38% { opacity: 1; } 46%, 88% { opacity: 0; } 96%, 100% { opacity: 1; } }
+  @keyframes swapB { 0%, 38% { opacity: 0; } 46%, 88% { opacity: 1; } 96%, 100% { opacity: 0; } }
+  .hero > * { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
+  .hero > :nth-child(2) { animation-delay: .08s; } .hero > :nth-child(3) { animation-delay: .16s; }
+  .hero > :nth-child(4) { animation-delay: .24s; } .hero > :nth-child(5) { animation-delay: .32s; }
+  .stage { animation: rise .9s cubic-bezier(.2,.7,.2,1) .35s both; }
+  @supports (animation-timeline: view()) {
+    .card, .panel.pad, details { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .hash .b { opacity: 0; } html { scroll-behavior: auto; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <img src="gitwolf-icon.svg" alt="GitWolf">
-    <h1>GitWolf</h1>
-    <p class="tag">A fast, clean, native Git client for Mac. Open source, always in sync, and it uses the Git you already have.</p>
-    <div class="actions">
-      <a class="button" href="https://github.com/ipuppyyt/GitWolf/releases/latest">Download for Mac</a>
-      <a class="button secondary" href="https://github.com/ipuppyyt/GitWolf">View on GitHub</a>
-    </div>
-    <p class="tag" style="font-size:14px;margin-top:14px">macOS 15 or later · free · MIT licence</p>
-  </header>
+<a class="skip" href="#main">Skip to content</a>
 
-  <h2>What you get</h2>
-  <div class="grid">
-    <div class="card"><h3>Always in sync</h3><p>Changes made in a terminal, an editor or another tool show up at once. No refresh button.</p></div>
-    <div class="card"><h3>Truly native</h3><p>SwiftUI and AppKit, no web view. Fixed rows, stable selection, no jank.</p></div>
-    <div class="card"><h3>Your Git, not ours</h3><p>Every action runs the system <code>git</code>, so your config, hooks and credentials behave as usual.</p></div>
-    <div class="card"><h3>Stage by line</h3><p>Stage, unstage or discard whole files, hunks or single lines. Interactive rebase, conflicts, bisect and blame.</p></div>
-    <div class="card"><h3>Your hosting, built in</h3><p>GitHub, GitLab, Bitbucket, Gitea and Azure DevOps: clone, pull requests, issues and CI results.</p></div>
-    <div class="card"><h3>Private by design</h3><p>Tokens stay in your Keychain. Never in a URL, a command line or a log file.</p></div>
+<header class="bar">
+  <nav aria-label="Main">
+    <a class="brand rounded" href="./"><img src="gitwolf-icon.svg" alt="" width="26" height="26">GitWolf</a>
+    <a class="link" href="#features">Features</a>
+    <a class="link" href="#install">Install</a>
+    <a class="link" href="#faq">FAQ</a>
+    <a class="link" href="https://github.com/ipuppyyt/GitWolf">GitHub</a>
+    <a class="link pill" href="https://github.com/ipuppyyt/GitWolf/releases/latest">Download</a>
+  </nav>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <div class="hero">
+      <p class="label">Open source Git client</p>
+      <h1 class="rounded">A fast, native Git client that <span>stays in sync</span></h1>
+      <p class="lead">GitWolf watches your repositories and shows every change the moment it happens, whether you made it here, in a terminal or in an editor. It uses the Git you already have.</p>
+      <div class="cta">
+        <a class="btn" href="https://github.com/ipuppyyt/GitWolf/releases/latest">Download GitWolf</a>
+        <a class="btn quiet" href="#install">Install with Homebrew</a>
+      </div>
+      <ul class="chips" aria-label="Highlights">
+        <li>macOS 15 or later</li><li>Windows 10 and 11</li><li>Free</li><li>MIT licence</li>
+      </ul>
+    </div>
+
+    <figure class="stage" style="margin-left:auto;margin-right:auto">
+      <div class="app" role="img" aria-label="The GitWolf window: a rail of repositories, a branch list, a commit history with a branch graph and the changes in the selected commit">
+        <div class="panel rail" aria-hidden="true">
+          <div class="tile on" style="--c:#012aa5;background:var(--brand)">GW<span class="badge"><span class="spin"></span></span></div>
+          <div class="tile" style="--c:#bd61f5">api<span class="badge"><span class="ok"></span></span></div>
+          <div class="tile" style="--c:#2ec2b8">web</div>
+          <div class="tile" style="--c:#ff9e40">ios</div>
+        </div>
+        <div class="panel side" aria-hidden="true">
+          <p class="label" style="margin:2px 9px 6px">Branches</p>
+          <div class="row sel"><span class="dot" style="background:var(--brand)"></span>main</div>
+          <div class="row"><span class="dot" style="background:var(--l2)"></span>feature/welcome</div>
+          <div class="row"><span class="dot" style="background:var(--l5)"></span>fix/rail-badge</div>
+          <p class="label" style="margin:14px 9px 6px">Tags</p>
+          <div class="row"><span class="dot" style="background:var(--l4)"></span>v0.2.0</div>
+          <div class="row"><span class="dot" style="background:var(--l4)"></span>v0.1.2</div>
+        </div>
+        <div class="panel hist" aria-hidden="true">
+          <div class="commit sel" style="--i:0"><div class="graph"><i></i></div><div><b>feat: first-run welcome</b><small>Ada · 2 min ago</small></div><span class="hash"><span class="a">0a597a1</span><span class="b">✓ Copied</span></span></div>
+          <div class="commit" style="--i:1"><div class="graph l2"><i></i></div><div><b>fix: stop the rail clipping badges</b><small>Sam · 1 h ago</small></div></div>
+          <div class="commit" style="--i:2"><div class="graph"><i></i></div><div><b>feat: Windows updates and CI controls</b><small>Lin · 3 h ago</small></div></div>
+          <div class="commit" style="--i:3"><div class="graph"><i></i></div><div><b>feat: new wolf logo as SVG</b><small>Ada · yesterday</small></div></div>
+          <div class="commit" style="--i:4"><div class="graph"><i></i></div><div><b>fix: pause CI lookups after a refusal</b><small>Ada · yesterday</small></div></div>
+          <div class="commit" style="--i:5"><div class="graph"><i></i></div><div><b>chore: release 0.1.2</b><small>Sam · 2 days ago</small></div></div>
+        </div>
+        <div class="panel detail" aria-hidden="true">
+          <h3>feat: first-run welcome</h3>
+          <div class="files"><span style="color:var(--green)">A WelcomeSheet.swift</span><span style="color:var(--orange)">M GitWolfApp.swift</span></div>
+          <div>
+            <span class="ln ctx" style="--i:0">@@ -226,6 +226,8 @@</span>
+            <span class="ln ctx" style="--i:1">  case .account: AddAccountSheet()</span>
+            <span class="ln del" style="--i:2">- // no first-run flow</span>
+            <span class="ln add" style="--i:3">+ case .welcome: WelcomeSheet(…)</span>
+            <span class="ln add" style="--i:4">+   .tint(Theme.brand)</span>
+            <span class="ln ctx" style="--i:5">  }</span>
+          </div>
+        </div>
+      </div>
+      <figcaption class="caption">GitWolf on the Mac: repositories, branches, history and changes, all live.</figcaption>
+    </figure>
   </div>
 
-  <h2>Install</h2>
-  <p>With Homebrew:</p>
-  <pre>brew install --cask ipuppyyt/gitwolf/gitwolf</pre>
-  <p>Or download the disk image from the <a href="https://github.com/ipuppyyt/GitWolf/releases/latest">latest release</a>, drag GitWolf to Applications and open it.
-     macOS will say it can't verify the app, because GitWolf is not notarised (that needs a paid Apple account). Allow it once:</p>
-  <ol>
-    <li>Open <strong>System Settings &gt; Privacy &amp; Security</strong>, scroll down and choose <strong>Open Anyway</strong>.</li>
-    <li>Or run <code>xattr -dr com.apple.quarantine /Applications/GitWolf.app</code> in Terminal.</li>
-  </ol>
-  <p>After that, updates install from inside the app. Each one is signed with a key only the maintainers hold, and the app refuses anything that does not verify.</p>
+  <div class="wrap">
+    <section id="features" aria-labelledby="features-title">
+      <p class="label">What you get</p>
+      <h2 id="features-title" class="rounded">Everything you do with Git, without the rough edges</h2>
+      <p class="sub">Built natively for each platform. No web view, no jank, fixed rows and stable selection.</p>
+      <div class="grid">
+        <article class="card"><div class="icon" style="--c:#2f6bff"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>
+          <h3 class="rounded">Always in sync</h3><p>The window watches the working tree, index and refs. Changes made in a terminal or editor appear at once. There is no refresh button.</p></article>
+        <article class="card"><div class="icon" style="--c:#4dcc73"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6"/></svg></div>
+          <h3 class="rounded">Stage by line</h3><p>Stage, unstage or discard a whole file, a hunk or single lines. Commit and amend, with every hook output shown when a commit is refused.</p></article>
+        <article class="card"><div class="icon" style="--c:#bd61f5"><svg viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7v10M8 5h4a4 4 0 0 1 4 4v1"/></svg></div>
+          <h3 class="rounded">History, rebase and conflicts</h3><p>A branch graph with search, interactive rebase, a conflict resolver with side-by-side choices, cherry-pick, revert, bisect and blame.</p></article>
+        <article class="card"><div class="icon" style="--c:#ff9e40"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8"/></svg></div>
+          <h3 class="rounded">Pull requests and CI</h3><p>Sign in to GitHub, GitLab, Bitbucket, Gitea or Azure DevOps. Clone, open pull requests, and see check results on every repository tile.</p></article>
+        <article class="card"><div class="icon" style="--c:#2ec2b8"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></div>
+          <h3 class="rounded">Many repositories at once</h3><p>A rail of repositories with live change badges. Press <kbd>⌘K</kbd> to jump anywhere, and see open pull requests across all of them.</p></article>
+        <article class="card"><div class="icon" style="--c:#fa669e"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></div>
+          <h3 class="rounded">Undo and safety nets</h3><p>Undo the last change, a checkout or a whole rebase. Browse the reflog. Discard and stash dialogs say exactly what will be lost.</p></article>
+        <article class="card"><div class="icon" style="--c:#5c85ff"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+          <h3 class="rounded">Repository statistics</h3><p>Commits per week, top contributors, hot and high-churn files, and who works in each folder.</p></article>
+        <article class="card"><div class="icon" style="--c:#f08c1a"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+          <h3 class="rounded">Your Git, your credentials</h3><p>Every action runs the system <code>git</code>, so your config and hooks apply. Tokens live in the system keychain, never in a URL or log.</p></article>
+        <article class="card"><div class="icon" style="--c:#3366ff"><svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+          <h3 class="rounded">Opens from the terminal</h3><p>Install the <code>gitwolf</code> command and run <code>gitwolf .</code> to open the current folder. Links like <code>gitwolf://open?path=…</code> work too.</p></article>
+      </div>
+    </section>
 
-  <h2>Open from the command line</h2>
-  <p>Install the <code>gitwolf</code> command from Settings, then:</p>
-  <pre>cd ~/code/my-project
-gitwolf .</pre>
+    <section id="install" aria-labelledby="install-title">
+      <p class="label">Install</p>
+      <h2 id="install-title" class="rounded">Download GitWolf for Mac or Windows</h2>
+      <p class="sub">Free, and updates install from inside the app.</p>
+      <div class="steps">
+        <div class="panel pad">
+          <h3 class="rounded">Mac with Homebrew</h3>
+          <p>One line, and no security prompt.</p>
+          <pre><code>brew install --cask ipuppyyt/gitwolf/gitwolf</code></pre>
+        </div>
+        <div class="panel pad">
+          <h3 class="rounded">Mac, disk image</h3>
+          <p>Get the <a href="https://github.com/ipuppyyt/GitWolf/releases/latest">latest .dmg</a>, drag GitWolf to Applications and open it. macOS asks once, because the app is not notarised:</p>
+          <ol><li>System Settings &gt; Privacy &amp; Security &gt; <strong>Open Anyway</strong>, or</li><li><code>xattr -dr com.apple.quarantine /Applications/GitWolf.app</code></li></ol>
+        </div>
+        <div class="panel pad">
+          <h3 class="rounded">Windows 10 and 11</h3>
+          <p>Download the <a href="https://github.com/ipuppyyt/GitWolf/releases/latest">Windows .zip</a>, unzip it anywhere you can write to, and run <code>GitWolf.App.exe</code>. Windows may ask once (More info &gt; Run anyway).</p>
+        </div>
+      </div>
+    </section>
 
-  <h2>Trust</h2>
-  <p>GitWolf is open source and builds from source with <code>swift build</code>. Releases are built by GitHub Actions from a tag, and the
-     checksums are published next to each download. Read <a href="https://github.com/ipuppyyt/GitWolf/blob/main/docs/RELEASING.md">how releases are made and signed</a>.</p>
+    <section id="trust" aria-labelledby="trust-title">
+      <p class="label">Trust</p>
+      <h2 id="trust-title" class="rounded">Open source, signed, and built in the open</h2>
+      <p class="sub">The code is on GitHub under the MIT licence and builds from source. Each release is built by GitHub Actions from a tag, with checksums published next to the download. Updates are signed with a key only the maintainers hold, and the app refuses anything that does not verify. <a href="https://github.com/ipuppyyt/GitWolf/blob/main/docs/RELEASING.md">Read how releases are made</a>.</p>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-title">
+      <p class="label">Questions</p>
+      <h2 id="faq-title" class="rounded">Frequently asked questions</h2>
+      <details><summary>Is GitWolf free?</summary><p>Yes. It is free and open source under the MIT licence.</p></details>
+      <details><summary>Does GitWolf replace Git?</summary><p>No. It runs the Git that is already installed on your computer, so your configuration, hooks and credentials behave exactly as they do in a terminal.</p></details>
+      <details><summary>Which hosting services does it work with?</summary><p>GitHub, GitLab, Bitbucket, Gitea and Forgejo (including Codeberg) and Azure DevOps, cloud or self-hosted. You can clone, open pull requests and see CI results.</p></details>
+      <details><summary>Why does macOS say it cannot verify GitWolf?</summary><p>GitWolf is not notarised, because notarisation needs a paid Apple Developer account. Choose Open Anyway in System Settings once. Installing with Homebrew skips this, and updates installed from inside the app never ask.</p></details>
+      <details><summary>Is there a Linux version?</summary><p>Not yet. GitWolf is built natively for each platform, and a Linux client is planned. Contributions are welcome.</p></details>
+    </section>
+  </div>
 </main>
+
 <footer>
-  GitWolf is open source. <a href="https://github.com/ipuppyyt/GitWolf/issues">Report an issue</a> ·
-  <a href="https://github.com/ipuppyyt/GitWolf/tree/main/docs">Documentation</a>
+  <div class="wrap">
+    <span>© 2026 GitWolf contributors. MIT licence.</span>
+    <span>
+      <a href="https://github.com/ipuppyyt/GitWolf">Source</a> ·
+      <a href="https://github.com/ipuppyyt/GitWolf/releases">Releases</a> ·
+      <a href="https://github.com/ipuppyyt/GitWolf/tree/main/docs">Documentation</a> ·
+      <a href="https://github.com/ipuppyyt/GitWolf/issues">Report an issue</a>
+    </span>
+  </div>
 </footer>
 </body>
 </html>
