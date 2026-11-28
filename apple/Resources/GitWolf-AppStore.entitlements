@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- The Mac App Store build: sandboxed. Folders come from the open panel (kept across launches with
+     security-scoped bookmarks), network is for fetch, pull, push and the hosting APIs. -->
+<dict>
+    <key>com.apple.security.app-sandbox</key><true/>
+    <key>com.apple.security.files.user-selected.read-write</key><true/>
+    <key>com.apple.security.files.bookmarks.app-scope</key><true/>
+    <key>com.apple.security.network.client</key><true/>
+</dict>
+</plist>

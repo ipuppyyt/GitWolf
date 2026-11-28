@@ -45,11 +45,14 @@ private final class ProcessBox: @unchecked Sendable {
 /// call concurrently from any context.
 public struct GitRunner: Sendable {
     public let workingDirectory: URL
+    /// The git used when a caller does not name one. The App Store build points this at the bundled git.
+    nonisolated(unsafe) public static var defaultGitPath = "/usr/bin/git"
+
     public let gitPath: String
     /// Extra environment for every process (e.g. credentials for network commands).
     public let extraEnvironment: [String: String]
 
-    public init(workingDirectory: URL, gitPath: String = "/usr/bin/git", extraEnvironment: [String: String] = [:]) {
+    public init(workingDirectory: URL, gitPath: String = GitRunner.defaultGitPath, extraEnvironment: [String: String] = [:]) {
         self.workingDirectory = workingDirectory
         self.gitPath = gitPath
         self.extraEnvironment = extraEnvironment
@@ -109,6 +112,12 @@ public struct GitRunner: Sendable {
         let extra = "/opt/homebrew/bin:/usr/local/bin"
         env["PATH"] = (env["PATH"].map { $0 + ":" } ?? "/usr/bin:/bin:/usr/sbin:/sbin:") + extra
         if readOnly { env["GIT_OPTIONAL_LOCKS"] = "0" }
+        // In the App Sandbox the user's ~/.gitconfig and system config are out of reach; git uses a config file
+        // inside the app's own container instead.
+        if env["APP_SANDBOX_CONTAINER_ID"] != nil {
+            env["GIT_CONFIG_NOSYSTEM"] = "1"
+            if env["GIT_CONFIG_GLOBAL"] == nil { env["GIT_CONFIG_GLOBAL"] = NSHomeDirectory() + "/.gitconfig" }
+        }
         return env
     }
 

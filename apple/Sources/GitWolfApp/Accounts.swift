@@ -97,6 +97,10 @@ enum AccountStorage {
 /// Writes the `GIT_ASKPASS` helper once and hands out its path.
 enum AskPass {
     static let path: String? = {
+        // The App Store sandbox cannot execute a script written at runtime, so that build ships it in the bundle.
+        if FolderAccess.isSandboxed {
+            return Bundle.main.url(forResource: "askpass", withExtension: "sh")?.path
+        }
         let fm = FileManager.default
         guard let support = try? fm.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         else { return nil }

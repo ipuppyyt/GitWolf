@@ -46,7 +46,7 @@ public struct GitRepository: Sendable {
 
     private static let emptyTree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 
-    public init(root: URL, gitPath: String = "/usr/bin/git", contextLines: Int = 4) {
+    public init(root: URL, gitPath: String = GitRunner.defaultGitPath, contextLines: Int = 4) {
         self.root = root
         self.gitPath = gitPath
         self.contextLines = min(max(contextLines, 0), 50)
@@ -59,7 +59,7 @@ public struct GitRepository: Sendable {
         do {
             top = try await probe.runString(["rev-parse", "--show-toplevel"], readOnly: true)
         } catch {
-            throw GitError(command: "rev-parse", exitCode: 128, stderr: "“\(url.lastPathComponent)” is not a Git repository.")
+                throw GitError(command: "rev-parse", exitCode: 128, stderr: "“\(url.lastPathComponent)” is not a Git repository.")
         }
         let path = top.trimmingCharacters(in: .whitespacesAndNewlines)
         return GitRepository(root: URL(fileURLWithPath: path, isDirectory: true))
@@ -80,7 +80,7 @@ public struct GitRepository: Sendable {
     /// `onProgress` receives git's progress output (e.g. "Receiving objects: 40%").
     public static func clone(
         url: String, into parent: URL, name: String,
-        gitPath: String = "/usr/bin/git",
+        gitPath: String = GitRunner.defaultGitPath,
         credential: GitCredential? = nil,
         askpassPath: String? = nil,
         options: CloneOptions = CloneOptions(),
@@ -99,7 +99,7 @@ public struct GitRepository: Sendable {
     }
 
     /// Creates (if needed) `directory` and initialises a repository in it.
-    public static func initialize(at directory: URL, initialBranch: String, gitPath: String = "/usr/bin/git") async throws -> URL {
+    public static func initialize(at directory: URL, initialBranch: String, gitPath: String = GitRunner.defaultGitPath) async throws -> URL {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let runner = GitRunner(workingDirectory: directory, gitPath: gitPath)
         var args = ["init"]

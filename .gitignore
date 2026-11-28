@@ -7,3 +7,4 @@ xcuserdata/
 .swiftpm/
 .claude/settings.local.json
 build/signing/
+.build-appstore/

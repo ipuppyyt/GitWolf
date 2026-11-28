@@ -1,9 +1,22 @@
 import AppKit
+#if !APPSTORE
 import Sparkle
+#endif
 
 /// In-app updates with Sparkle: it checks the update feed, downloads the new version, verifies its EdDSA
 /// signature against the public key in Info.plist, replaces the app and relaunches it. Nothing is sent
 /// about the user or their repositories. A build run with `swift run` has no feed, so it never checks.
+#if APPSTORE
+/// The Mac App Store updates the app itself, so there is nothing to check or download here.
+@MainActor
+enum UpdateManager {
+    static let autoKey = "SUEnableAutomaticChecks"
+    static var isPackaged: Bool { false }
+    static func start() {}
+    static func checkForUpdates() {}
+    static func setAutomaticChecks(_ on: Bool) {}
+}
+#else
 @MainActor
 enum UpdateManager {
     /// Sparkle's own preference for checking automatically (once a day); the Settings toggle writes it.
@@ -33,3 +46,4 @@ enum UpdateManager {
 
     static func setAutomaticChecks(_ on: Bool) { controller?.updater.automaticallyChecksForUpdates = on }
 }
+#endif

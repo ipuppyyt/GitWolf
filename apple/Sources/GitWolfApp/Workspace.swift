@@ -103,6 +103,7 @@ final class Workspace {
     /// Removes a repository from recents, pins and groups (the folder itself is untouched).
     func forget(_ path: String) {
         RecentRepositories.remove(path)
+        FolderAccess.forget(path)
         recents = RecentRepositories.load()
         editHome { $0.remove(path) }
         setIcon(nil, for: path)
@@ -143,6 +144,7 @@ final class Workspace {
     func open(_ url: URL) { Task { await openAsync(url) } }
 
     func openAsync(_ url: URL) async {
+        FolderAccess.remember(url)
         do {
             let repo = try await GitRepository.open(at: url)
             let id = repo.root.path
@@ -213,6 +215,7 @@ final class Workspace {
             return
         }
         isRestoring = true
+        FolderAccess.restore()
         let paths = UserDefaults.standard.stringArray(forKey: Self.openKey) ?? []
         let selected = UserDefaults.standard.string(forKey: Self.selectedKey)
         for path in paths where FileManager.default.fileExists(atPath: path) {

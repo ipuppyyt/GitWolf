@@ -317,6 +317,7 @@ struct WelcomeSheet: View {
     /// Git is there when Apple's command line tools are installed, or a custom Git was set. This does not run
     /// `/usr/bin/git`, which would pop up the installer on a Mac without the tools.
     static func gitIsAvailable() -> Bool {
+        if BundledGit.path != nil { return true }
         let custom = (UserDefaults.standard.string(forKey: SettingsKey.gitPath) ?? "").trimmingCharacters(in: .whitespaces)
         if !custom.isEmpty, FileManager.default.isExecutableFile(atPath: custom) { return true }
         let task = Process()

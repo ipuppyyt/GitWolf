@@ -74,7 +74,9 @@ enum SettingsKey {
 /// apply immediately without restarting.
 struct AppSettings: Sendable {
     static let shared = AppSettings()
-    static let defaultGitPath = "/usr/bin/git"
+    /// The git inside the app (the App Store build has one, because Apple's `/usr/bin/git` cannot run in the
+    /// sandbox), otherwise the system one.
+    static var defaultGitPath: String { BundledGit.path ?? "/usr/bin/git" }
 
     private var defaults: UserDefaults { .standard }
 
