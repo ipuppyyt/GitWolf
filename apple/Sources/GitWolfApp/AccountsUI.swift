@@ -123,7 +123,7 @@ struct AddAccountSheet: View {
         host.trimmingCharacters(in: .whitespaces).lowercased().hasPrefix("http://") ? "http" : nil
     }
     private var hostHidden: Bool {
-        OAuthClients.hasBuiltIn(host: kind.defaultHost) && cleanHost == kind.defaultHost
+        kind != .gitea && OAuthClients.hasBuiltIn(host: kind.defaultHost) && cleanHost == kind.defaultHost
     }
     private var oauthAvailable: Bool { kind.oauthFlow != nil && kind.supportsOAuth(host: cleanHost) }
     private var effectiveMethod: Method { method == .browser && !oauthAvailable ? .token : method }
