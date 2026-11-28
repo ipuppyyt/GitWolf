@@ -126,7 +126,15 @@ struct AddAccountSheet: View {
     }
     private var hostHidden: Bool { !selfHosted }
     private var oauthAvailable: Bool { kind.oauthFlow != nil && kind.supportsOAuth(host: cleanHost) }
-    private var passwordAllowed: Bool { kind != .github && kind != .gitlab }
+    private var defaultMethod: Method { kind == .gitlab && selfHosted ? .password : .browser }
+    private var passwordAllowed: Bool {
+        switch kind {
+        case .github: false
+        case .gitlab: cleanHost != "gitlab.com"
+        case .bitbucket: cleanHost != "bitbucket.org"
+        default: true
+        }
+    }
     private var effectiveMethod: Method {
         if method == .browser && !oauthAvailable { return .token }
         if method == .password && !passwordAllowed { return oauthAvailable ? .browser : .token }
@@ -143,7 +151,7 @@ struct AddAccountSheet: View {
         case .browser:
             return !resolvedClientID.isEmpty && (!kind.oauthNeedsClientSecret || !clientSecret.trimmingCharacters(in: .whitespaces).isEmpty)
         case .token: return !token.trimmingCharacters(in: .whitespaces).isEmpty
-                && (!kind.needsUsername || !username.trimmingCharacters(in: .whitespaces).isEmpty)
+                && (!kind.needsUsername(host: cleanHost) || !username.trimmingCharacters(in: .whitespaces).isEmpty)
         case .password: return !token.trimmingCharacters(in: .whitespaces).isEmpty
                 && !username.trimmingCharacters(in: .whitespaces).isEmpty
         }
@@ -160,6 +168,7 @@ struct AddAccountSheet: View {
                         kind = item
                         if !item.hasSelfHosted { selfHosted = false }
                         host = selfHosted ? "" : item.defaultHost
+                        method = defaultMethod
                         error = nil
                     } label: {
                         VStack(spacing: 5) {
@@ -180,7 +189,7 @@ struct AddAccountSheet: View {
             }
 
             if kind.hasSelfHosted {
-                Toggle("Self-hosted server", isOn: Binding(get: { selfHosted }, set: { selfHosted = $0; host = $0 ? "" : kind.defaultHost; error = nil }))
+                Toggle("Self-hosted server", isOn: Binding(get: { selfHosted }, set: { selfHosted = $0; host = $0 ? "" : kind.defaultHost; method = defaultMethod; error = nil }))
                     .toggleStyle(.switch).controlSize(.small).disabled(session.isActive)
             }
 
@@ -298,7 +307,7 @@ struct AddAccountSheet: View {
 
     @ViewBuilder private var secretSection: some View {
         let password = effectiveMethod == .password
-        if kind.needsUsername || password {
+        if kind.needsUsername(host: cleanHost) || password {
             field("USERNAME") { TextField("username", text: $username).textFieldStyle(.plain) }
         }
         field(password ? "PASSWORD" : kind.secretName.uppercased()) {
@@ -372,8 +381,11 @@ struct AddAccountSheet: View {
         Task {
             do {
                 if kind.supportsRepositoryListing {
-                    let login = try await ProviderClient(account: account, token: secret).currentUser()
-                    if !kind.needsUsername && !password { account.username = login }
+                    do {
+                        let login = try await ProviderClient(account: account, token: secret).currentUser()
+                        if !kind.needsUsername(host: cleanHost) && !password { account.username = login }
+                    } catch ProviderError.unauthorized where password && kind == .gitlab {
+                    }
                 } else if account.username.isEmpty {
                     account.username = "git"
                 }

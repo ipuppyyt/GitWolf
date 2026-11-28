@@ -32,15 +32,14 @@ public enum ProviderKind: String, Codable, CaseIterable, Sendable, Identifiable 
     /// Whether repositories can be listed (and tokens verified) through an API.
     public var supportsRepositoryListing: Bool { self != .azure }
 
-    /// Whether this kind needs a username next to the secret (Bitbucket app passwords).
-    public var needsUsername: Bool { self == .bitbucket }
+    public func needsUsername(host: String) -> Bool { self == .bitbucket && host != "bitbucket.org" }
 
     /// Where the user creates a token / app password for this provider.
     public func tokenPageURL(host: String) -> URL? {
         switch self {
         case .github: URL(string: "https://\(host)/settings/tokens/new?scopes=repo&description=GitWolf")
         case .gitlab: URL(string: "https://\(host)/-/user_settings/personal_access_tokens?name=GitWolf&scopes=read_api,read_repository,write_repository")
-        case .bitbucket: URL(string: "https://bitbucket.org/account/settings/app-passwords/")
+        case .bitbucket: host == "bitbucket.org" ? URL(string: "https://id.atlassian.com/manage-profile/security/api-tokens") : nil
         case .gitea: URL(string: "https://\(host)/user/settings/applications")
         case .azure: URL(string: "https://dev.azure.com")
         }
@@ -49,7 +48,7 @@ public enum ProviderKind: String, Codable, CaseIterable, Sendable, Identifiable 
     /// What the secret is called in this provider's UI.
     public var secretName: String {
         switch self {
-        case .bitbucket: "App password"
+        case .bitbucket: "API token"
         case .gitea: "Access token"
         default: "Personal access token"
         }
@@ -60,7 +59,7 @@ public enum ProviderKind: String, Codable, CaseIterable, Sendable, Identifiable 
         switch self {
         case .github: "Needs the “repo” scope."
         case .gitlab: "Needs read_api, read_repository and write_repository."
-        case .bitbucket: "Needs repository read and write permissions."
+        case .bitbucket: "Needs the read:repository, write:repository and read:pullrequest scopes."
         case .gitea: "Needs repository read and write permissions."
         case .azure: "Needs Code (read & write). In Azure DevOps: User settings → Personal access tokens."
         }

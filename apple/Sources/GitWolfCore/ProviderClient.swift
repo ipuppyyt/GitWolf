@@ -101,10 +101,9 @@ public struct ProviderClient: Sendable {
             r.setValue(secret, forHTTPHeaderField: "PRIVATE-TOKEN")
         case .gitea:
             r.setValue("token \(secret)", forHTTPHeaderField: "Authorization")
-        case .bitbucket where account.host != "bitbucket.org":
-            // Bitbucket Data Center / Server: HTTP access tokens are Bearer tokens.
+        case .bitbucket:
             r.setValue("Bearer \(secret)", forHTTPHeaderField: "Authorization")
-        case .bitbucket, .azure:
+        case .azure:
             let basic = Data("\(account.username):\(secret)".utf8).base64EncodedString()
             r.setValue("Basic \(basic)", forHTTPHeaderField: "Authorization")
         }
@@ -182,7 +181,13 @@ public struct ProviderClient: Sendable {
             _ = try await fetch(apiBase + "/repos?limit=1")
             return account.username
         }
-        let (data, _) = try await fetch(apiBase + "/user")
+        let (data, _): (Data, HTTPURLResponse)
+        do {
+            (data, _) = try await fetch(apiBase + "/user")
+        } catch where account.kind == .bitbucket {
+            _ = try await fetch(apiBase + "/repositories?role=member&pagelen=1")
+            return ""
+        }
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw ProviderError.invalidResponse }
         let name: String? = switch account.kind {
         case .github, .gitea: json["login"] as? String ?? json["username"] as? String

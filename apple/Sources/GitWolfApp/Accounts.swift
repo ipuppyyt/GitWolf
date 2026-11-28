@@ -82,9 +82,10 @@ enum AccountStorage {
     /// The credential git should use for a remote on `host`, if the user added an account for it.
     static func credential(forHost host: String) async -> GitCredential? {
         guard let account = account(forHost: host), let secret = await secret(for: account) else { return nil }
+        let bitbucketCloudToken = account.kind == .bitbucket && account.hostName == "bitbucket.org" && account.usesPassword != true
         let user = account.usesOAuth
             ? GitCredential.oauthUsername(kind: account.kind, fallback: account.username)
-            : account.username
+            : bitbucketCloudToken ? "x-bitbucket-api-token-auth" : account.username
         return GitCredential(host: account.hostName, username: user, token: secret,
                              useBearerHeader: account.usesOAuth && account.kind == .azure)
     }
