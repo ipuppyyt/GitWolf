@@ -28,6 +28,7 @@ public sealed partial class SettingsView : UserControl
     internal event Action<bool>? SplitChanged;
 
     internal event Action? UpdateRequested;
+    internal event Action? AboutRequested;
 
     internal void Attach(Window window, AppSettings settings, Workspace workspace)
     {
@@ -138,7 +139,10 @@ public sealed partial class SettingsView : UserControl
         void Set(Func<SettingsState, SettingsState> change) => settings.Update(change(settings.State));
 
         var swatches = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
-        foreach (var choice in Enum.GetValues<AccentChoice>()) swatches.Children.Add(Swatch(settings, choice, swatches));
+        var dark = ActualTheme == ElementTheme.Dark;
+        // GitWolf's own colour comes first.
+        foreach (var choice in Enum.GetValues<AccentChoice>().OrderBy(c => c != AccentChoice.Wolf))
+            swatches.Children.Add(Swatch(settings, choice, dark, swatches));
 
         Group("Appearance",
             Row("Theme", "Follow Windows, or always light or dark", Picker(s.Appearance,
@@ -162,6 +166,17 @@ public sealed partial class SettingsView : UserControl
         var spelling = new ToggleSwitch { IsOn = s.SpellCheck, MinWidth = 0, OnContent = null, OffContent = null };
         spelling.Toggled += (_, _) => Set(x => x with { SpellCheck = spelling.IsOn });
 
+        var tray = new ToggleSwitch { IsOn = s.ShowTrayIcon, MinWidth = 0, OnContent = null, OffContent = null };
+        tray.Toggled += (_, _) => Set(x => x with { ShowTrayIcon = tray.IsOn });
+
+        var results = new ToggleSwitch { IsOn = s.NotifyChecks, MinWidth = 0, OnContent = null, OffContent = null };
+        results.Toggled += (_, _) => Set(x => x with { NotifyChecks = results.IsOn });
+
+        Group("Windows",
+            Row("Icon near the clock", "Open repositories and their changes, from the notification area", tray),
+            Row("CI notifications", "When the checked-out commit’s checks finish while GitWolf is in the background",
+                results));
+
         Group("Commit message",
             Row("Check spelling", "Underline misspelled words while typing", spelling));
 
@@ -176,9 +191,15 @@ public sealed partial class SettingsView : UserControl
         // A row names its control after its title, which doesn't say what this button does.
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(check, "Check Now");
 
+        var about = new Button { Content = "About…" };
+        about.Click += (_, _) => AboutRequested?.Invoke();
+
         Group("Updates",
             Row("Check for updates", "Once a day. Nothing is installed without asking", updates),
-            version);
+            version,
+            Row("About GitWolf", "Version, links and contributors", about));
+
+        OpenFromOutside();
 
         Group("History & diffs",
             Row("Profile pictures", "From GitHub, for github.com repositories. Turning this off deletes saved pictures", pictures),
@@ -193,14 +214,15 @@ public sealed partial class SettingsView : UserControl
                 v => Set(x => x with { DiffContext = v }))));
     }
 
-    private static Button Swatch(AppSettings settings, AccentChoice choice, Panel all)
+    private static Button Swatch(AppSettings settings, AccentChoice choice, bool dark, Panel all)
     {
-        var fill = new SolidColorBrush(Theming.Accent(choice));
+        var fill = new SolidColorBrush(Theming.Accent(choice, dark));
         var tick = new FontIcon
         {
             Glyph = "", FontSize = 10, Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
             Opacity = settings.State.Accent == choice ? 1 : 0,
         };
+        var title = choice == AccentChoice.Wolf ? "GitWolf" : choice.ToString();
         var button = new Button
         {
             Width = 22, Height = 22, MinWidth = 0, Padding = new Thickness(0), CornerRadius = new CornerRadius(11),
@@ -209,8 +231,8 @@ public sealed partial class SettingsView : UserControl
         // Keep the swatch colour while hovered and pressed.
         button.Resources["ButtonBackgroundPointerOver"] = fill;
         button.Resources["ButtonBackgroundPressed"] = fill;
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(button, choice.ToString());
-        ToolTipService.SetToolTip(button, choice.ToString());
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(button, title);
+        ToolTipService.SetToolTip(button, title);
         button.Click += (_, _) =>
         {
             foreach (var other in all.Children.OfType<Button>())

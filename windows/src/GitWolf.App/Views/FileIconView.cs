@@ -80,8 +80,28 @@ public sealed partial class FileIconView : UserControl
             { Glyph: IconGlyph.Letters, Value: { } text } => Tile(text, colour, icon.DarkText, size),
             { Glyph: IconGlyph.Symbol, Value: { } symbol } => Symbol(symbol, colour, size * 0.94),
             { Glyph: IconGlyph.Folder } => Folder(icon.Value, colour, size),
+            { Glyph: IconGlyph.Logo, Value: { } slug } => Logo(slug, icon.Color, size),
             _ => React(colour, size),
         };
+    }
+
+    private static FrameworkElement Logo(string slug, uint rgb, double size)
+    {
+        if (!LanguageLogos.Paths.TryGetValue(slug, out var path)) return Symbol("doc", Brush(rgb), size * 0.94);
+        return new Viewbox
+        {
+            Width = size * 0.92, Height = size * 0.92,
+            Child = Icons.Create(new Icons.Shape(24, path), Brush(OnDark(rgb))),
+        };
+    }
+
+    /// <summary>Very dark brands are lightened so they show on a dark window.</summary>
+    private static uint OnDark(uint rgb)
+    {
+        uint r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        if (0.2126 * r + 0.7152 * g + 0.0722 * b >= 0.28 * 255) return rgb;
+        static uint Lift(uint c) => (uint)(c + (255 - c) * 0.55);
+        return (Lift(r) << 16) | (Lift(g) << 8) | Lift(b);
     }
 
     private static Border Tile(string text, Brush colour, bool dark, double size) => new()
@@ -90,7 +110,7 @@ public sealed partial class FileIconView : UserControl
         CornerRadius = new CornerRadius(size * 0.24),
         Child = new TextBlock
         {
-            Text = text, FontSize = size * (text.Length > 2 ? 0.40 : 0.52),
+            Text = text, FontSize = size * (text.Length > 3 ? 0.32 : text.Length > 2 ? 0.40 : 0.52),
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             Foreground = new SolidColorBrush(dark ? Color.FromArgb(0xC7, 0, 0, 0) : Colors.White),
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,

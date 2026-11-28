@@ -67,6 +67,5 @@ public sealed partial class RepositoryStore
     public Task<bool> ResetAsync(string target, ResetMode mode) =>
         PerformAsync("Resetting…", r => r.ResetAsync(target, mode));
 
-    public Task<bool> UndoAsync(string expectedHead, string target) =>
-        PerformAsync("Undoing…", r => r.UndoAsync(expectedHead, target));
+    public Task<bool> UndoAsync(UndoPlan plan) => PerformAsync("Undoing…", r => r.UndoAsync(plan));
 }

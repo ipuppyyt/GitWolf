@@ -7,12 +7,13 @@ namespace GitWolf.App.Services;
 
 internal enum AppearanceChoice { System, Light, Dark }
 
-internal enum AccentChoice { Indigo, Blue, Purple, Pink, Red, Orange, Green, Teal }
+/// <summary>Saved as a number, so new colours go at the end.</summary>
+internal enum AccentChoice { Indigo, Blue, Purple, Pink, Red, Orange, Green, Teal, Wolf }
 
 /// <summary>The saved preferences. Never holds credentials.</summary>
 internal sealed record SettingsState(
     AppearanceChoice Appearance = AppearanceChoice.System,
-    AccentChoice Accent = AccentChoice.Blue,
+    AccentChoice Accent = AccentChoice.Wolf,
     int AutoFetchMinutes = 5,
     int CommitPageSize = 1000,
     int DiffContext = 4,
@@ -22,7 +23,9 @@ internal sealed record SettingsState(
     bool SpellCheck = true, double SidebarWidth = 248, double ListShare = 0.45,
     double MessageHeight = 90, double FilesHeight = 0,
     bool CheckForUpdates = true, long LastUpdateCheck = 0, string SkippedUpdate = "",
-    string EditorPath = "", IReadOnlyList<CustomAction>? CustomActions = null);
+    string EditorPath = "", IReadOnlyList<CustomAction>? CustomActions = null,
+    string CloneFolder = "", bool ShowTrayIcon = true, bool NotifyChecks = true,
+    bool WelcomeSeen = false);
 
 /// <summary>
 /// User settings, kept in %LOCALAPPDATA%\GitWolf\settings.json and read on every use so changes
@@ -96,6 +99,11 @@ internal sealed class AppSettings : IStoreSettings
         && !path.StartsWith("//", StringComparison.Ordinal)
         && path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(path);
 
+    /// <summary>A full path to an existing folder on this computer, not on the network.</summary>
+    public static bool IsLocalFolder(string path) =>
+        Path.IsPathFullyQualified(path) && !path.StartsWith(@"\\", StringComparison.Ordinal)
+        && !path.StartsWith("//", StringComparison.Ordinal) && Directory.Exists(path);
+
     public void Update(SettingsState next)
     {
         next = Sanitize(next);
@@ -110,7 +118,7 @@ internal sealed class AppSettings : IStoreSettings
     private static SettingsState Sanitize(SettingsState s) => s with
     {
         Appearance = Enum.IsDefined(s.Appearance) ? s.Appearance : AppearanceChoice.System,
-        Accent = Enum.IsDefined(s.Accent) ? s.Accent : AccentChoice.Blue,
+        Accent = Enum.IsDefined(s.Accent) ? s.Accent : AccentChoice.Wolf,
         AutoFetchMinutes = Math.Clamp(s.AutoFetchMinutes, 0, 1440),
         CommitPageSize = Math.Clamp(s.CommitPageSize, 100, 20000),
         DiffContext = Math.Clamp(s.DiffContext, 0, 50),
@@ -120,6 +128,7 @@ internal sealed class AppSettings : IStoreSettings
         SkippedUpdate = s.SkippedUpdate ?? "",
         EditorPath = (s.EditorPath ?? "").Trim().Trim('"'),
         CustomActions = Complete(s.CustomActions),
+        CloneFolder = (s.CloneFolder ?? "").Trim(),
         MessageHeight = double.IsFinite(s.MessageHeight) ? Math.Clamp(s.MessageHeight, 60, 600) : 90,
         // Zero means the list fits its files.
         FilesHeight = double.IsFinite(s.FilesHeight) && s.FilesHeight > 0 ? Math.Clamp(s.FilesHeight, 52, 800) : 0,

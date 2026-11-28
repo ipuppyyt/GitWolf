@@ -3,6 +3,7 @@ using GitWolf.App.Views;
 using GitWolf.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 
 namespace GitWolf.App.Services;
@@ -10,8 +11,10 @@ namespace GitWolf.App.Services;
 /// <summary>Clone and new-repository dialogs. Ported from CreateRepositorySheets.swift.</summary>
 internal static class CreateDialogs
 {
+    /// <param name="lastFolder">Where the last clone went; used when it is a local folder that still exists.</param>
     /// <returns>The cloned folder, or null when cancelled.</returns>
-    public static Task<string?> CloneAsync(XamlRoot root, IntPtr window, string? gitPath, AccountStore accounts)
+    public static Task<string?> CloneAsync(
+        XamlRoot root, IntPtr window, string? gitPath, AccountStore accounts, string lastFolder)
     {
         var url = new TextBox { Header = "Repository URL", PlaceholderText = "https://host/owner/repo.git" };
         var name = new TextBox { Header = "Folder name" };
@@ -23,6 +26,7 @@ internal static class CreateDialogs
             name.Text = suggested = GitRepository.SuggestedName(url.Text);
         };
         var options = new CloneOptionFields();
+        _ = OfferCopiedAddressAsync(url);
         return ShowAsync(root, window, "Clone repository", "Clone", [url], name, () =>
         {
             var (from, folder, chosen) = (url.Text.Trim(), name.Text.Trim(), options.Read());
@@ -36,7 +40,26 @@ internal static class CreateDialogs
                     from, parent, folder, gitPath, credential, askpass, progress, token, chosen);
             };
         }, options.View,
-            extra: accounts.Accounts.Any(a => a.Kind.SupportsRepositoryListing()) ? RepositoryPicker(accounts, url) : null);
+            extra: accounts.Accounts.Any(a => a.Kind.SupportsRepositoryListing()) ? RepositoryPicker(accounts, url) : null,
+            // A network folder isn't checked: an unreachable share would stall the window.
+            location: AppSettings.IsLocalFolder(lastFolder) ? lastFolder : null);
+    }
+
+    /// <summary>Fills in a repository address from the clipboard, unless something was typed meanwhile.</summary>
+    private static async Task OfferCopiedAddressAsync(TextBox url)
+    {
+        try
+        {
+            var content = Clipboard.GetContent();
+            if (!content.Contains(StandardDataFormats.Text)) return;
+            var offered = CloneAddress.FromClipboard(await content.GetTextAsync());
+            if (offered is not null && url.Text.Length == 0) url.Text = offered;
+        }
+        catch (Exception e)
+        {
+            // Another program can hold the clipboard; the field just stays empty.
+            Trace.TraceWarning($"Reading the clipboard failed: {e.GetType().Name}");
+        }
     }
 
     /// <summary>The repositories of a saved account; picking one fills in its URL.</summary>
@@ -114,11 +137,12 @@ internal static class CreateDialogs
     private static async Task<string?> ShowAsync(
         XamlRoot root, IntPtr window, string title, string verb, IReadOnlyList<Control> before, TextBox name,
         Func<Func<string, Action<string>, CancellationToken, Task<string>>> prepare, Control? after = null,
-        UIElement? extra = null)
+        UIElement? extra = null, string? location = null)
     {
-        var location = new TextBox
+        var locationBox = new TextBox
         {
-            Header = "Location", Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            Header = "Location",
+            Text = location ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         };
         var choose = new Button { Content = "Choose…", VerticalAlignment = VerticalAlignment.Bottom };
         var status = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12, MaxHeight = 120 };
@@ -127,7 +151,7 @@ internal static class CreateDialogs
         {
             ColumnSpacing = 8,
             ColumnDefinitions = { new ColumnDefinition(), new ColumnDefinition { Width = GridLength.Auto } },
-            Children = { location, choose },
+            Children = { locationBox, choose },
         };
         Grid.SetColumn(choose, 1);
         var content = new StackPanel { Spacing = 12, Width = 420 };
@@ -153,7 +177,7 @@ internal static class CreateDialogs
                 var picker = new FolderPicker();
                 picker.FileTypeFilter.Add("*");
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, window);
-                if (await picker.PickSingleFolderAsync() is { } folder) location.Text = folder.Path;
+                if (await picker.PickSingleFolderAsync() is { } folder) locationBox.Text = folder.Path;
             }
             catch (Exception e)
             {
@@ -173,7 +197,7 @@ internal static class CreateDialogs
             {
                 if (running is not null) return;
                 if (before.OfType<TextBox>().Any(box => box.Text.Trim().Length == 0)
-                    || name.Text.Trim().Length == 0 || !Path.IsPathFullyQualified(location.Text.Trim()))
+                    || name.Text.Trim().Length == 0 || !Path.IsPathFullyQualified(locationBox.Text.Trim()))
                 {
                     status.Text = "Fill in every field, with a full folder path as the location.";
                     return;
@@ -186,7 +210,7 @@ internal static class CreateDialogs
                 // Deferral ends now so Cancel keeps working while git runs.
                 deferral.Complete();
                 deferral = null;
-                var parent = location.Text.Trim();
+                var parent = locationBox.Text.Trim();
                 void Progress(string chunk)
                 {
                     var line = chunk.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).LastOrDefault();

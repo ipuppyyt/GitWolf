@@ -95,8 +95,8 @@ public sealed class HistoryToolTests : IDisposable
         File.WriteAllText(Path.Combine(_dir, "new.txt"), "local");
         var log = await Repo.ReflogAsync();
 
-        await Assert.ThrowsAsync<GitException>(() => Repo.UndoAsync(log[1].Hash, log[2].Hash));
-        await Repo.UndoAsync(log[0].Hash, log[1].Hash);
+        await Assert.ThrowsAsync<GitException>(() => Repo.UndoAsync(new UndoPlan.Reset(log[2].Hash, "x") { ExpectedHead = log[1].Hash }));
+        await Repo.UndoAsync(new UndoPlan.Reset(log[1].Hash, "x") { ExpectedHead = log[0].Hash });
 
         Assert.True(File.Exists(Path.Combine(_dir, "a.txt")));
         Assert.True(File.Exists(Path.Combine(_dir, "new.txt")));

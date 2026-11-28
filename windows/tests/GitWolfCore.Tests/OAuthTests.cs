@@ -167,8 +167,10 @@ public sealed class OAuthTests
     {
         var credential = new GitCredential("dev.azure.com", "u", "tok") { UseBearerHeader = true };
         var env = credential.Environment("/x", "https://dev.azure.com/o/p/_git/r");
-        Assert.Equal("2", env["GIT_CONFIG_COUNT"]);
-        // Unlike macOS the header is tied to the origin, so no other server receives it.
+        Assert.Equal("3", env["GIT_CONFIG_COUNT"]);
+        Assert.Equal("http.https://dev.azure.com/.followRedirects", env["GIT_CONFIG_KEY_2"]);
+        Assert.Equal("false", env["GIT_CONFIG_VALUE_2"]);
+        // The header is tied to the origin, so no other server receives it.
         Assert.Equal("http.https://dev.azure.com/.extraheader", env["GIT_CONFIG_KEY_1"]);
         Assert.Equal("Authorization: Bearer tok", env["GIT_CONFIG_VALUE_1"]);
         Assert.Equal("1", new GitCredential("h", "u", "t").Environment("/x", "https://h/r")["GIT_CONFIG_COUNT"]);

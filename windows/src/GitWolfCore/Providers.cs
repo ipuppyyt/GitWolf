@@ -257,7 +257,12 @@ public sealed record GitCredential(string Host, string Username, string Token)
         AddConfig(environment, "credential.helper", "");
         // Passed through the environment, never the command line or a config file. Unlike macOS, the
         // header is scoped to this origin, so another remote, submodule or redirect never receives it.
-        if (UseBearerHeader) AddConfig(environment, $"http.{origin}/.extraheader", $"Authorization: Bearer {Token}");
+        if (UseBearerHeader)
+        {
+            AddConfig(environment, $"http.{origin}/.extraheader", $"Authorization: Bearer {Token}");
+            // Some git versions (2.43, for one) keep sending the header to wherever a redirect leads.
+            AddConfig(environment, $"http.{origin}/.followRedirects", "false");
+        }
         return environment;
     }
 

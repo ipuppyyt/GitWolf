@@ -150,6 +150,7 @@ public sealed partial class HistoryView : UserControl
         if (args.InRecycleQueue || args.ItemContainer.ContentTemplateRoot is not CommitRowView view
             || args.Item is not CommitRow row) return;
         view.Show(row);
+        Spoken.Name(args.ItemContainer, Spoken.Commit(row.Commit));
         // Near the end: fetch the next page of history.
         if (!GitSearch && Search.Text.Length == 0 && args.ItemIndex >= _commits.Count - 20) DispatcherQueue.TryEnqueue(() => _store?.LoadMoreCommits());
     }

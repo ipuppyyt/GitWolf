@@ -27,6 +27,8 @@ public sealed partial class ChangesView : UserControl
         _store = store;
         _syncing = true;
         _rows.Clear();
+        // A filter belongs to the repository it was typed in.
+        Filter.Text = "";
         _syncing = false;
         ShowFiles();
         ShowDraft();
@@ -37,13 +39,19 @@ public sealed partial class ChangesView : UserControl
     {
         if (_store is not { } store) return;
         var rows = new List<FileRow>();
-        void Section(string title, DiffSource source, IReadOnlyList<FileChange> files)
+        var status = store.Status;
+        var count = status.Conflicted.Count + status.Staged.Count + status.Unstaged.Count + status.Untracked.Count;
+        var query = Filter.Text.Trim();
+        // Only worth the space once the list is long; stays while something is typed.
+        Filter.Visibility = count > FilterThreshold || query.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        Filter.PlaceholderText = $"Filter {count} files";
+        void Section(string title, DiffSource source, IReadOnlyList<FileChange> all)
         {
+            var files = FileFilter.Apply(all, query);
             if (files.Count == 0) return;
-            rows.Add(new FileRow(null, source, $"{title} ({files.Count})"));
+            rows.Add(new FileRow(null, source, $"{title} ({files.Count})", Filtered: query.Length > 0));
             rows.AddRange(files.Select(f => new FileRow(f, source, IsLfs: store.LfsPaths.Contains(f.Path))));
         }
-        var status = store.Status;
         Section("CONFLICTS", DiffSource.Conflicted, status.Conflicted);
         Section("STAGED", DiffSource.Staged, status.Staged);
         Section("CHANGES", DiffSource.Unstaged, status.Unstaged);
@@ -53,9 +61,18 @@ public sealed partial class ChangesView : UserControl
         // Headers are keyed by section only, so a changed count updates the row in place.
         ListSync.Apply(_rows, rows, r => (r.Source.Kind, r.File?.Path ?? ""));
         _syncing = false;
-        Clean.Visibility = store.IsLoaded && status.IsClean ? Visibility.Visible : Visibility.Collapsed;
+        Clean.Text = status.IsClean ? "Working tree is clean" : $"No files match “{query}”";
+        Clean.Visibility = store.IsLoaded && (status.IsClean || rows.Count == 0)
+            ? Visibility.Visible : Visibility.Collapsed;
         ShowSelection();
         ShowCommitState();
+    }
+
+    private const int FilterThreshold = 20;
+
+    private void OnFilter(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (!_syncing) ShowFiles();
     }
 
     internal void ShowSelection()
@@ -99,6 +116,8 @@ public sealed partial class ChangesView : UserControl
     {
         if (args.InRecycleQueue || args.ItemContainer.ContentTemplateRoot is not FileRowView view
             || args.Item is not FileRow row || _store is not { } store) return;
+        Spoken.Name(args.ItemContainer, row.File is null ? Spoken.File(row)
+            : $"{Spoken.File(row)}, {(row.Source == DiffSource.Staged ? "staged" : "not staged")}");
 
         var staged = row.Source == DiffSource.Staged;
         if (row.File is { } file)
@@ -106,22 +125,28 @@ public sealed partial class ChangesView : UserControl
             // A staged rename must unstage both of its paths.
             string[] paths = file.OriginalPath is { } from && staged ? [from, file.Path] : [file.Path];
             view.Show(row, staged ? "Unstage" : "Stage",
-                () => _ = staged ? store.UnstageAsync(paths) : store.StageAsync(paths));
+                () => _ = staged ? store.UnstageAsync(paths) : store.StageAsync(paths),
+                $"{(staged ? "Unstage" : "Stage")} {file.Path}");
         }
         else if (row.Source == DiffSource.Conflicted)
         {
             view.Show(row, null, null);
         }
-        else if (staged)
-        {
-            view.Show(row, "Unstage all", () => _ = store.UnstageAllAsync());
-        }
         else
         {
             var source = row.Source;
-            view.Show(row, "Stage all", () => _ = store.StageAsync(
-                (source == DiffSource.Untracked ? store.Status.Untracked : store.Status.Unstaged)
-                    .Select(f => f.Path).ToList()));
+            var label = (staged ? "Unstage " : "Stage ") + (row.Filtered ? "shown" : "all");
+            view.Show(row, label, () =>
+            {
+                var query = Filter.Text.Trim();
+                // While filtering, only the files on screen are acted on.
+                if (staged && query.Length == 0) _ = store.UnstageAllAsync();
+                else if (staged) _ = store.UnstageAsync(FileFilter.Apply(store.Status.Staged, query)
+                    .SelectMany(f => f.OriginalPath is { } from ? [from, f.Path] : new[] { f.Path }).ToList());
+                else _ = store.StageAsync(FileFilter.Apply(
+                        source == DiffSource.Untracked ? store.Status.Untracked : store.Status.Unstaged, query)
+                    .Select(f => f.Path).ToList());
+            });
         }
     }
 

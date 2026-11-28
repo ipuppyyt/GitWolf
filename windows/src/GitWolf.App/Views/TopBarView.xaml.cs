@@ -46,6 +46,7 @@ public sealed partial class TopBarView : UserControl
         _store = store;
         var status = store.Status;
         BranchName.Text = status.BranchDisplay;
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(BranchButton, $"Switch branch, on {status.BranchDisplay}");
         ShowBranchIcon(status.Branch);
         var history = store.Mode == StoreMode.History;
         HistorySelected.Visibility = history ? Visibility.Visible : Visibility.Collapsed;

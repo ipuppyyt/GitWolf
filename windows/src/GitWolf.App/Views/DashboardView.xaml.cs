@@ -13,12 +13,6 @@ namespace GitWolf.App.Views;
 /// </summary>
 public sealed partial class DashboardView : UserControl
 {
-    private const int Shown = 9;
-    private const double MinCardWidth = 250;
-
-    private IReadOnlyList<string> _paths = [];
-    private int _columns;
-
     public DashboardView()
     {
         InitializeComponent();
@@ -47,38 +41,6 @@ public sealed partial class DashboardView : UserControl
     internal event Action? CloneRequested;
     internal event Action? NewRequested;
     internal event Action<IReadOnlyList<string>>? PathsRequested;
-
-    internal void Show(IReadOnlyList<string> recents)
-    {
-        var paths = recents.Take(Shown).ToList();
-        RecentSection.Visibility = paths.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        if (paths.SequenceEqual(_paths)) return;
-        _paths = paths;
-        Cards.Children.Clear();
-        foreach (var path in _paths) Cards.Children.Add(Card(path));
-        _columns = 0;
-        Arrange(Cards.ActualWidth);
-    }
-
-    private void OnCardsSized(object sender, SizeChangedEventArgs e) => Arrange(e.NewSize.Width);
-
-    /// <summary>As many equal columns as fit.</summary>
-    private void Arrange(double width)
-    {
-        var columns = Math.Max(1, (int)((width + Cards.ColumnSpacing) / (MinCardWidth + Cards.ColumnSpacing)));
-        if (columns == _columns) return;
-        _columns = columns;
-        Cards.ColumnDefinitions.Clear();
-        Cards.RowDefinitions.Clear();
-        for (var i = 0; i < columns; i++) Cards.ColumnDefinitions.Add(new ColumnDefinition());
-        for (var i = 0; i < Cards.Children.Count; i++)
-        {
-            if (i % columns == 0) Cards.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            var card = (FrameworkElement)Cards.Children[i];
-            Grid.SetColumn(card, i % columns);
-            Grid.SetRow(card, i / columns);
-        }
-    }
 
     private Button Card(string path)
     {

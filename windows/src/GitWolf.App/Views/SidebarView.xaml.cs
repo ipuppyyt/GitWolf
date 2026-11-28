@@ -100,8 +100,11 @@ public sealed partial class SidebarView : UserControl
     {
         if (item.Row == next.Row) return;
         item.Row = next.Row;
-        if (Rows.ContainerFromItem(item) is ListViewItem { ContentTemplateRoot: SidebarRowView view })
+        if (Rows.ContainerFromItem(item) is ListViewItem { ContentTemplateRoot: SidebarRowView view } container)
+        {
             view.Show(item.Row, animate: true);
+            Spoken.Name(container, Spoken.Sidebar(item.Row));
+        }
     }
 
     private void OnWeb(object sender, RoutedEventArgs e) => _store?.OpenOnWeb(new WebTarget.Repository());
@@ -209,6 +212,7 @@ public sealed partial class SidebarView : UserControl
                 if (store.Tags.Count > 1)
                     foreach (var server in store.Remotes)
                         Add($"Push all tags to {server}", () => _ = store.PushAllTagsAsync(server));
+                Add("Copy release notes since this tag", () => _ = CopyReleaseNotesAsync(store, row.Title));
                 Add("Delete local tag…", () => _ = ConfirmAsync(
                     $"Delete tag “{row.Title}”?", "The local tag is removed.", "Delete",
                     () => store.DeleteTagAsync(row.Title)));
@@ -254,6 +258,13 @@ public sealed partial class SidebarView : UserControl
         return menu;
     }
 
+    private static async Task CopyReleaseNotesAsync(RepositoryStore store, string tag)
+    {
+        if (await store.ReadAsync(r => r.CommitSubjectsAsync(tag)) is not { } subjects) return;
+        if (subjects.Count == 0) store.ErrorMessage = $"There are no commits since {tag}.";
+        else Dialogs.Copy(CommitMessage.Changelog(subjects));
+    }
+
     private async Task ConfirmAsync(string title, string message, string verb, Func<Task<bool>> action)
     {
         var store = _store;
@@ -287,6 +298,7 @@ public sealed partial class SidebarView : UserControl
         if (!args.InRecycleQueue && args.ItemContainer.ContentTemplateRoot is SidebarRowView view && args.Item is SidebarItem item)
         {
             view.Show(item.Row);
+            Spoken.Name(args.ItemContainer, Spoken.Sidebar(item.Row));
             if (_entering.Remove(item)) view.Enter();
         }
     }

@@ -60,6 +60,22 @@ public static class ChangeKindCode
     };
 }
 
+public static class ChangeKindNames
+{
+    /// <summary>The plain name a screen reader says for a change.</summary>
+    public static string SpokenName(this ChangeKind kind) => kind switch
+    {
+        ChangeKind.Added => "Added",
+        ChangeKind.Deleted => "Deleted",
+        ChangeKind.Renamed => "Renamed",
+        ChangeKind.Copied => "Copied",
+        ChangeKind.TypeChanged => "Type changed",
+        ChangeKind.Untracked => "New file",
+        ChangeKind.Unmerged => "Conflicted",
+        _ => "Modified",
+    };
+}
+
 public sealed record FileChange(string Path, string? OriginalPath, ChangeKind Kind)
 {
     public string Id => Path;

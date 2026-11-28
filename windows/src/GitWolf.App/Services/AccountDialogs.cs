@@ -41,7 +41,8 @@ internal static class AccountDialogs
         public readonly ProgressBar Working = new() { IsIndeterminate = true, Visibility = Visibility.Collapsed };
     }
 
-    public static async Task AddAsync(XamlRoot root, AccountStore accounts)
+    /// <param name="again">A browser-signed-in account to fill the form with, to sign in to it again.</param>
+    public static async Task AddAsync(XamlRoot root, AccountStore accounts, ProviderAccount? again = null)
     {
         var form = new Form();
         foreach (var kind in Enum.GetValues<ProviderKind>()) form.Kind.Items.Add(kind.Title());
@@ -67,7 +68,7 @@ internal static class AccountDialogs
         var dialog = new ContentDialog
         {
             RequestedTheme = (root.Content as FrameworkElement)?.ActualTheme ?? ElementTheme.Default,
-            XamlRoot = root, Title = "Add account", PrimaryButtonText = "Add", CloseButtonText = "Cancel",
+            XamlRoot = root, Title = again is null ? "Add account" : "Sign in again", PrimaryButtonText = "Add", CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,
             Content = new ScrollViewer { Content = content, MaxHeight = 520 },
         };
@@ -168,7 +169,14 @@ internal static class AccountDialogs
         form.ClientSecret.PasswordChanged += (_, _) => Update();
         AutomationProperties.SetName(form.Secret, "Secret");
         form.Kind.SelectedIndex = 0;
+        if (again is not null)
+        {
+            // In this order: choosing the provider and typing the host reset what comes after them.
+            form.Kind.SelectedIndex = (int)again.Kind;
+            form.Host.Text = again.Scheme is { } scheme ? $"{scheme}://{again.Host}" : again.Host;
+        }
         Update();
+        if (again?.OAuthClientId is { } known) form.ClientId.Text = known;
 
         // The dialog stays open while signing in, showing the code or the failure.
         dialog.PrimaryButtonClick += async (_, e) =>

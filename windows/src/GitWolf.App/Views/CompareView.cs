@@ -43,6 +43,7 @@ public sealed partial class CompareView : UserControl
     {
         var swap = new Button { Content = "⇄" };
         ToolTipService.SetToolTip(swap, "Swap");
+        Spoken.Name(swap, "Swap");
         swap.Click += (_, _) => _ = _store?.SwapCompareAsync();
         _run.Click += (_, _) => _ = _store?.RunCompareAsync();
         _from.TextChanged += (_, _) => Edited();
@@ -60,6 +61,7 @@ public sealed partial class CompareView : UserControl
             store.CompareSinceAncestor = _since.IsChecked == true;
             if (store.Comparison is not null) _ = store.RunCompareAsync();
         };
+        Spoken.Name(_list, "Comparison");
         _list.ContainerContentChanging += OnRow;
         _list.ItemClick += OnClick;
 
@@ -111,6 +113,7 @@ public sealed partial class CompareView : UserControl
     {
         var button = new Button { Content = new FontIcon { Glyph = "", FontSize = 10 }, MinWidth = 0 };
         ToolTipService.SetToolTip(button, "Pick a branch or tag");
+        Spoken.Name(button, "Pick a branch or tag");
         button.Click += (_, _) =>
         {
             if (_store is not { } store) return;
@@ -193,8 +196,10 @@ public sealed partial class CompareView : UserControl
         if (row.File is { } file)
         {
             var view = new FileRowView();
-            view.Show(new FileRow(file, Source()), null, null);
+            var shown = new FileRow(file, Source());
+            view.Show(shown, null, null);
             host.Content = view;
+            Spoken.Name(args.ItemContainer, Spoken.File(shown));
         }
         else if (row.Commit is { } commit)
         {
@@ -216,9 +221,11 @@ public sealed partial class CompareView : UserControl
             }
             ToolTipService.SetToolTip(grid, "Show in History");
             host.Content = grid;
+            Spoken.Name(args.ItemContainer, Spoken.Commit(commit));
         }
         else
         {
+            Spoken.Name(args.ItemContainer, row.Heading ?? "");
             host.Content = new TextBlock
             {
                 Text = row.Heading ?? "", FontSize = 11.5, Opacity = 0.65, Margin = new Thickness(0, 10, 0, 2),

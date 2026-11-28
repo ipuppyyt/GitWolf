@@ -204,7 +204,10 @@ public sealed partial class DiffView : UserControl
     private void OnSplitRow(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (!args.InRecycleQueue && args.ItemContainer.ContentTemplateRoot is SplitRowView view && args.Item is SplitRow row)
+        {
             view.Show(row, _tokens, _changes, _staging, Unfold);
+            Spoken.Name(args.ItemContainer, Spoken.Split(row));
+        }
     }
 
     private void Render(DiffRowView view, DiffLine line) =>
@@ -215,6 +218,9 @@ public sealed partial class DiffView : UserControl
     private void OnRow(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (!args.InRecycleQueue && args.ItemContainer.ContentTemplateRoot is DiffRowView view && args.Item is DiffLine line)
+        {
             Render(view, line);
+            Spoken.Name(args.ItemContainer, Spoken.Line(line));
+        }
     }
 }

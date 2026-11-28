@@ -22,8 +22,10 @@
                 </StackPanel>
             </HyperlinkButton>
         </StackPanel>
-        <ListView x:Name="Rows" Grid.Row="1" Padding="4,0,4,8" SelectionMode="None" IsItemClickEnabled="True"
+        <ListView x:Name="Rows" AutomationProperties.Name="Branches, tags and stashes" Grid.Row="1" Padding="4,0,4,8" SelectionMode="None" IsItemClickEnabled="True"
                   ItemClick="OnClick" DoubleTapped="OnDoubleTap" ContextRequested="OnContext"
+                  CanDragItems="True" DragItemsStarting="OnDragStarting" AllowDrop="True"
+                  DragOver="OnDragOver" Drop="OnDrop"
                   ContainerContentChanging="OnRow">
             <!-- The stock list transitions take close to a second to show new rows; rows animate themselves. -->
             <ListView.ItemContainerTransitions>

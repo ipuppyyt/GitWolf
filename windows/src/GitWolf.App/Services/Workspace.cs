@@ -7,7 +7,8 @@ namespace GitWolf.App.Services;
 
 /// <summary>What is remembered between launches. Paths and view preferences only, never credentials.</summary>
 internal sealed record WorkspaceState(
-    List<string>? Open = null, string? Selected = null, bool SplitDiff = false, List<string>? Recents = null);
+    List<string>? Open = null, string? Selected = null, bool SplitDiff = false, List<string>? Recents = null,
+    HomeLayout? Home = null);
 
 /// <summary>
 /// All repositories open in the window. Each keeps its own store (and file watcher) alive so rail
@@ -63,10 +64,30 @@ internal sealed class Workspace : IDisposable
     /// Folders opened before, newest first. Missing ones are left out. Network paths aren't checked,
     /// because an unreachable share would stall the window.
     /// </summary>
-    public IReadOnlyList<string> Recents => _recents
-        .Where(p => p.StartsWith(@"\\", StringComparison.Ordinal) || p.StartsWith("//", StringComparison.Ordinal)
-            || Directory.Exists(p))
-        .ToList();
+    public IReadOnlyList<string> Recents => _recents.Where(CanShow).ToList();
+
+    private static bool CanShow(string path) =>
+        path.StartsWith(@"\\", StringComparison.Ordinal) || path.StartsWith("//", StringComparison.Ordinal)
+        || Directory.Exists(path);
+
+    private HomeLayout _home = new();
+
+    /// <summary>Pins and groups, without folders that are gone. They stay saved in case they return.</summary>
+    public HomeLayout Home => _home.Pruned(CanShow);
+
+    public void EditHome(Action<HomeLayout> change)
+    {
+        change(_home);
+        Save();
+        Changed?.Invoke();
+    }
+
+    /// <summary>Takes a repository off the home screen. The folder is untouched.</summary>
+    public void Forget(string path)
+    {
+        _recents.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
+        EditHome(home => home.Remove(path));
+    }
 
     /// <summary>Raised when the list or the selection changes.</summary>
     public event Action? Changed;
@@ -128,6 +149,7 @@ internal sealed class Workspace : IDisposable
     {
         var state = Load();
         _splitDiff = state.SplitDiff;
+        _home = HomeLayout.Sanitized(state.Home);
         // State saved before recents existed starts from the open repositories.
         _recents = (state.Recents ?? state.Open ?? []).Where(p => !string.IsNullOrWhiteSpace(p)).Take(MaxRecents).ToList();
         _restoring = true;
@@ -173,7 +195,7 @@ internal sealed class Workspace : IDisposable
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(StatePath)!);
-            var state = new WorkspaceState(_repos.Select(r => r.Id).ToList(), Selected?.Id, _splitDiff, _recents);
+            var state = new WorkspaceState(_repos.Select(r => r.Id).ToList(), Selected?.Id, _splitDiff, _recents, _home);
             // Write then rename, so a crash can't leave a half-written file.
             var temporary = StatePath + ".tmp";
             File.WriteAllText(temporary, JsonSerializer.Serialize(state));

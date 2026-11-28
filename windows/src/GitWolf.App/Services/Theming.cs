@@ -10,8 +10,10 @@ namespace GitWolf.App.Services;
 internal static class Theming
 {
     /// <summary>Same values as AccentChoice in AppSettings.swift.</summary>
-    public static Color Accent(AccentChoice choice) => choice switch
+    public static Color Accent(AccentChoice choice, bool dark) => choice switch
     {
+        // The logo's blue, lightened on dark backgrounds so it stays readable.
+        AccentChoice.Wolf => Rgb(dark ? 0x3366FFu : 0x012AA5u),
         AccentChoice.Indigo => Rgb(0x6B61FA),
         AccentChoice.Purple => Rgb(0xA85CF5),
         AccentChoice.Pink => Rgb(0xF54D94),
@@ -34,7 +36,18 @@ internal static class Theming
     public static void Apply(Window window, SettingsState settings)
     {
         if (window.Content is not FrameworkElement root) return;
-        var accent = Accent(settings.Accent);
+        var wanted = settings.Appearance switch
+        {
+            AppearanceChoice.Light => ElementTheme.Light,
+            AppearanceChoice.Dark => ElementTheme.Dark,
+            _ => ElementTheme.Default,
+        };
+        _applying = true;
+        root.RequestedTheme = wanted;
+        // Read after the request, so "System" resolves to what Windows is using.
+        var dark = root.ActualTheme == ElementTheme.Dark;
+        _appliedDark = dark;
+        var accent = Accent(settings.Accent, dark);
         var resources = Application.Current.Resources;
         resources["SystemAccentColor"] = accent;
         double[] shades = [0.14, 0.30, 0.50];
@@ -50,16 +63,24 @@ internal static class Theming
         }
         Palette.SetAccent(accent);
 
-        var wanted = settings.Appearance switch
-        {
-            AppearanceChoice.Light => ElementTheme.Light,
-            AppearanceChoice.Dark => ElementTheme.Dark,
-            _ => ElementTheme.Default,
-        };
         // Accent resources are only re-read on a theme change, so pass through the other theme first.
         root.RequestedTheme = root.ActualTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
         root.RequestedTheme = wanted;
+        _applying = false;
         UpdateCaptionButtons(window, root.ActualTheme);
+    }
+
+    private static bool _applying;
+    private static bool _appliedDark;
+
+    /// <summary>GitWolf's blue differs by theme, so it is applied again when Windows switches.</summary>
+    public static void ThemeChanged(Window window, SettingsState settings)
+    {
+        if (window.Content is not FrameworkElement root) return;
+        UpdateCaptionButtons(window, root.ActualTheme);
+        if (!_applying && settings.Accent == AccentChoice.Wolf && settings.Appearance == AppearanceChoice.System
+            && (root.ActualTheme == ElementTheme.Dark) != _appliedDark)
+            Apply(window, settings);
     }
 
     /// <summary>The window buttons are drawn by the system, which doesn't follow the app's theme.</summary>

@@ -14,7 +14,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Margin="6,16" Spacing="8">
                     <TextBlock Text="Settings" FontSize="15" FontWeight="SemiBold" Margin="14,0,0,8" />
-                    <ListView x:Name="Panes" SelectionMode="Single" SelectionChanged="OnPane">
+                    <ListView x:Name="Panes" AutomationProperties.Name="Settings sections" SelectionMode="Single" SelectionChanged="OnPane">
                         <x:String>General</x:String>
                         <x:String>Git</x:String>
                         <x:String>Tools</x:String>

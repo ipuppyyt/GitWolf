@@ -84,7 +84,20 @@ public sealed partial class RepositoryStore : INotifyPropertyChanged, IDisposabl
     public string? BusyLabel { get; private set; }
 
     private string? _errorMessage;
-    public string? ErrorMessage { get => _errorMessage; set => Set(ref _errorMessage, value); }
+    public string? ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            // The offer belongs to the message it came with.
+            ReauthAccount = null;
+            Set(ref _errorMessage, value);
+        }
+    }
+
+    private ProviderAccount? _reauthAccount;
+    /// <summary>Set after <see cref="ErrorMessage"/> when signing in again may fix a refused change.</summary>
+    public ProviderAccount? ReauthAccount { get => _reauthAccount; private set => Set(ref _reauthAccount, value); }
 
     private PullBlock? _pullBlock;
     /// <summary>Set when a pull was refused to protect local work; the UI asks what to do, then clears it.</summary>
@@ -260,6 +273,7 @@ public sealed partial class RepositoryStore : INotifyPropertyChanged, IDisposabl
         {
             var repo = Repo;
             var limit = _commitLimit;
+            var started = Stopwatch.GetTimestamp();
             var (snapshot, extras) = await Task.Run(async () =>
             {
                 var read = await repo.SnapshotAsync(limit);
@@ -270,6 +284,8 @@ public sealed partial class RepositoryStore : INotifyPropertyChanged, IDisposabl
             Untrusted = null;
             ApplyExtras(extras.Bisect, extras.Lfs, extras.Shallow);
             Apply(snapshot);
+            if (snapshot.Commits.Count >= LargeHistory && Stopwatch.GetElapsedTime(started) > SlowRefresh)
+                SpeedUpHistory(repo);
         }
         catch (UntrustedRepositoryException e)
         {
@@ -281,6 +297,30 @@ public sealed partial class RepositoryStore : INotifyPropertyChanged, IDisposabl
             Trace.TraceWarning($"Refresh failed: {e.GetType().Name}");
             if (!IsLoaded) ErrorMessage = e.Message;
         }
+    }
+
+    private static readonly TimeSpan SlowRefresh = TimeSpan.FromSeconds(0.5);
+    /// <summary>Below this many commits the index gains nothing, however slow the disk was.</summary>
+    private const int LargeHistory = 500;
+    private bool _commitGraphTried;
+
+    /// <summary>Once per session, in the background, for a repository that is slow to read.</summary>
+    private void SpeedUpHistory(GitRepository repo)
+    {
+        if (_commitGraphTried) return;
+        _commitGraphTried = true;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (!await repo.HasCommitGraphAsync()) await repo.WriteCommitGraphAsync();
+            }
+            catch (Exception e)
+            {
+                // Only an optimisation: the repository works without it.
+                Trace.TraceWarning($"Writing the commit-graph failed: {e.GetType().Name}");
+            }
+        });
     }
 
     /// <summary>Only assigns what changed so the UI doesn't re-render (and flicker) needlessly.</summary>
