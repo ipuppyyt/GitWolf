@@ -6,6 +6,25 @@
     <description>GitWolf updates</description>
     <language>en</language>
     <item>
+      <title>Version 0.2.4</title>
+      <pubDate>Sat, 28 Nov 2026 07:35:58 +0000</pubDate>
+      <sparkle:version>2004</sparkle:version>
+      <sparkle:shortVersionString>0.2.4</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>10.0.17763</sparkle:minimumSystemVersion>
+      <description><![CDATA[### Added (macOS)
+- **Notarised by Apple:** the app and disk image are signed with a Developer ID, so a first install opens without the *Open Anyway* step.
+- **Language logos:** files show the logo of their language or tool (about 100, from Simple Icons) in its brand colour, with lettered tiles where no logo exists. Many more extensions and file names are recognised.
+- **Filter the Changes list:** a search box appears once more than 20 files have changed. Stage All and Unstage All become *Stage Shown* and *Unstage Shown* while a filter is active.
+
+### Added (Windows)
+- **Repository icons:** right-click a tile and choose *Change icon…* for a symbol, a tile colour or a picture, or drop a picture on the tile. Pictures are stored in the app's data folder, never in the repository. (Thanks to Rage-Gaming.)
+- The app and taskbar now use the wolf icon.
+
+### Changed
+- The website has a working demo window of the app on Mac and Windows, and no navigation bar.]]></description>
+      <enclosure url="https://github.com/ipuppyyt/GitWolf/releases/download/v0.2.4/GitWolf-0.2.4-windows-x64.zip" length="87093703" type="application/octet-stream" sparkle:edSignature="A86DkLU9+pDP2F6DI++OkV7Uc5vugTHW0voMv49l9q3a4/GGFRQ6JLRiWnl29y8CCx/TKdgAnpuXfyPej55GDw=="/>
+    </item>
+    <item>
       <title>Version 0.2.0</title>
       <pubDate>Sat, 28 Nov 2026 02:34:08 +0000</pubDate>
       <sparkle:version>2000</sparkle:version>
@@ -42,4 +61,4 @@
     </item>
   </channel>
 </rss>
-<!-- gitwolf-signature: AgiEi2AIOkcQ/2nDLpBSS+8vek3VCRRUsAiOfuwk8Cf3vHuZkBoet1wFHDCgx9IWUsHbD5U6SirVqZ5lyQDlCQ== -->
+<!-- gitwolf-signature: pv91tvO0YxzGTaiRf5w9lP+TvPh6nPUx7ubgTN51d6FcgX91eoHZCLdRylke3I1eWRgErjCCKfxUej8pvD7dAQ== -->
