@@ -8,7 +8,9 @@ import Observation
 /// `builtIn` for github.com / gitlab.com / codeberg.org; everything else (GitHub Enterprise, GitLab
 /// self-managed, other Gitea servers) uses a client ID the user registered, remembered per host.
 enum OAuthClients {
-    static let builtIn: [String: String] = [:]
+    static let builtIn: [String: String] = [
+        "github.com": "Ov23lir62T7trMJh2u2v",
+    ]
     private static let key = "oauthClientIDs"
 
     static func clientID(host: String) -> String? {

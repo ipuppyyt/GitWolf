@@ -122,6 +122,9 @@ struct AddAccountSheet: View {
     private var scheme: String? {
         host.trimmingCharacters(in: .whitespaces).lowercased().hasPrefix("http://") ? "http" : nil
     }
+    private var hostHidden: Bool {
+        OAuthClients.hasBuiltIn(host: kind.defaultHost) && cleanHost == kind.defaultHost
+    }
     private var oauthAvailable: Bool { kind.oauthFlow != nil && kind.supportsOAuth(host: cleanHost) }
     private var effectiveMethod: Method { method == .browser && !oauthAvailable ? .token : method }
     private var needsClientID: Bool { effectiveMethod == .browser && !OAuthClients.hasBuiltIn(host: cleanHost) }
@@ -176,18 +179,20 @@ struct AddAccountSheet: View {
             }
             .pickerStyle(.segmented).labelsHidden().disabled(session.isActive)
 
-            field("HOST") {
-                TextField(kind.defaultHost, text: $host).textFieldStyle(.plain)
-                    .disabled(session.isActive)
-                    .onChange(of: host) { _, value in
-                        // Enterprise / self-managed servers: pick the provider from the hostname.
-                        var h = value.lowercased()
-                        for p in ["https://", "http://"] where h.hasPrefix(p) { h.removeFirst(p.count) }
-                        if let guessed = ProviderKind.guess(host: h), guessed != kind { kind = guessed }
-                    }
+            if !hostHidden {
+                field("HOST") {
+                    TextField(kind.defaultHost, text: $host).textFieldStyle(.plain)
+                        .disabled(session.isActive)
+                        .onChange(of: host) { _, value in
+                            // Enterprise / self-managed servers: pick the provider from the hostname.
+                            var h = value.lowercased()
+                            for p in ["https://", "http://"] where h.hasPrefix(p) { h.removeFirst(p.count) }
+                            if let guessed = ProviderKind.guess(host: h), guessed != kind { kind = guessed }
+                        }
+                }
+                Text(verbatim: "For GitHub Enterprise, GitLab self-managed, Gitea or Bitbucket Data Center, enter your server, e.g. git.company.com or https://git.company.com:8443.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
-            Text(verbatim: "For GitHub Enterprise, GitLab self-managed, Gitea or Bitbucket Data Center, enter your server, e.g. git.company.com or https://git.company.com:8443.")
-                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
 
             switch effectiveMethod {
             case .browser: browserSection
