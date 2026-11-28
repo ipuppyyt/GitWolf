@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/master.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/runner.d",
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/debug/GitWolfPackageTests.build/runner.swiftdeps"
+  }
+}

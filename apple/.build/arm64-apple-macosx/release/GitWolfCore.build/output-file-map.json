@@ -1,0 +1,262 @@
+{
+  "": {
+    "dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitWolfCore.d",
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitWolfCore.o",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/master.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/AppVersion.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/AppVersion.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/AppVersion~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/AppVersion.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Appcast.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Appcast.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Appcast~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Appcast.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Avatars.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Avatars.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Avatars~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Avatars.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Badge.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Badge.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Badge~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Badge.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Bisect.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Bisect.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Bisect~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Bisect.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Blame.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Blame.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Blame~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Blame.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/BranchTools.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/BranchTools.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/BranchTools~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/BranchTools.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/CIStatus.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CIStatus.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CIStatus~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CIStatus.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/CloneOptions.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CloneOptions.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CloneOptions~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CloneOptions.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/CollabActions.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CollabActions.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CollabActions~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CollabActions.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/CommitMessage.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CommitMessage.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CommitMessage~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CommitMessage.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Compare.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Compare.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Compare~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Compare.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Conflicts.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Conflicts.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Conflicts~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Conflicts.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Contributors.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Contributors.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Contributors~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Contributors.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/CustomActions.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CustomActions.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CustomActions~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/CustomActions.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/FileIcons.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileIcons.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileIcons~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileIcons.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/FileWatcher.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileWatcher.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileWatcher~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/FileWatcher.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Fork.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Fork.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Fork~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Fork.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/GitRepository.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRepository.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRepository~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRepository.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/GitRunner.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRunner.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRunner~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GitRunner.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/GraphLayout.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GraphLayout.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GraphLayout~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/GraphLayout.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/HistorySearch.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HistorySearch.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HistorySearch~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HistorySearch.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/HomeLayout.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HomeLayout.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HomeLayout~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/HomeLayout.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Hooks.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Hooks.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Hooks~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Hooks.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Ignore.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Ignore.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Ignore~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Ignore.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/InlineDiff.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/InlineDiff.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/InlineDiff~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/InlineDiff.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Insights.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Insights.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Insights~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Insights.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/LFS.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LFS.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LFS~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LFS.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/LaunchRequest.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LaunchRequest.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LaunchRequest~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/LaunchRequest.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Models.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Models.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Models.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Notifications.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Notifications.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Notifications~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Notifications.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/OAuth.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/OAuth.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/OAuth~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/OAuth.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Operations.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Operations.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Operations~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Operations.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Parsers.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Parsers.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Parsers~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Parsers.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/PatchBuilder.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/PatchBuilder.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/PatchBuilder~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/PatchBuilder.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Patches.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Patches.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Patches~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Patches.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Performance.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Performance.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Performance~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Performance.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/ProviderClient.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/ProviderClient.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/ProviderClient~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/ProviderClient.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Providers.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Providers.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Providers~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Providers.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Rebase.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Rebase.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Rebase~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Rebase.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/RepoIcons.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepoIcons.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepoIcons~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepoIcons.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/RepositoryScanner.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepositoryScanner.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepositoryScanner~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/RepositoryScanner.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Reset.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Reset.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Reset~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Reset.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/SideBySide.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SideBySide.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SideBySide~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SideBySide.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Signing.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Signing.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Signing~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Signing.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/StashTools.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/StashTools.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/StashTools~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/StashTools.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Submodules.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Submodules.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Submodules~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Submodules.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Sync.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Sync.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Sync~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Sync.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/SyntaxHighlighter.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SyntaxHighlighter.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SyntaxHighlighter~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/SyntaxHighlighter.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/UpdateSigning.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/UpdateSigning.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/UpdateSigning~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/UpdateSigning.swiftdeps"
+  },
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfCore/Worktrees.swift": {
+    "object": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Worktrees.swift.o",
+    "swiftmodule": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Worktrees~partial.swiftmodule",
+    "swift-dependencies": "/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/GitWolfCore.build/Worktrees.swiftdeps"
+  }
+}

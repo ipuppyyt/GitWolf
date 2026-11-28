@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/runner/work/GitWolf/GitWolf/apple/.build/arm64-apple-macosx/release/gitwolf-release'
+relocations:     []
+...

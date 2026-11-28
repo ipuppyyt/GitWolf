@@ -1,0 +1,11 @@
+#!/bin/sh
+# Opens a folder in GitWolf:  gitwolf [folder]   (default: the current folder)
+# Installed by GitWolf > Settings > Command line tool, or copy it anywhere on your PATH.
+case "${1:-}" in
+  -h|--help) echo "usage: gitwolf [folder]"; exit 0 ;;
+esac
+target="${1:-.}"
+if [ ! -e "$target" ]; then echo "gitwolf: no such file or folder: $target" >&2; exit 1; fi
+dir="$(cd "$(dirname "$target")" && pwd -P)/$(basename "$target")"
+[ -d "$target" ] || dir="$(dirname "$dir")"
+exec open -b org.gitwolf.GitWolf "$dir"

@@ -1,0 +1,6 @@
+version: "Apple Swift version 6.1.2 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)"
+options: "9484532f0dae02e5a74882a8244228db90489a24d30c2ffa5fa6d28e51b5860c"
+build_start_time: [1795832892, 706535000]
+build_end_time: [1795832893, 891776000]
+inputs:
+  "/Users/runner/work/GitWolf/GitWolf/apple/Sources/GitWolfRelease/main.swift": [1795832685, 443164895]
