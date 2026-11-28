@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>GitWolf</title>
+    <link>https://github.com/ipuppyyt/GitWolf</link>
+    <description>GitWolf updates</description>
+    <language>en</language>
+    <item>
+      <title>Version 0.2.0</title>
+      <pubDate>Sat, 28 Nov 2026 02:34:08 +0000</pubDate>
+      <sparkle:version>2000</sparkle:version>
+      <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>10.0.17763</sparkle:minimumSystemVersion>
+      <description><![CDATA[### Added (macOS)
+- **First-run welcome:** checks Git, connects an account, finds repositories in a folder you pick, and sets appearance and accent. Shown once, every step skippable, never shown to existing users.
+- **Repository statistics** (Repository > Statistics…): commits per week, contributors, hot and high-churn files, and who works in each folder.
+- **Pull Requests Across Repositories** (Hosting menu, ⌥⌘P): open pull requests from every open repository, split into Mine, Others and CI failing.
+- **Command line and links:** `gitwolf [folder]` (install it in Settings), `gitwolf://open?path=` links, and folders dropped on the Dock icon open as repositories.
+- **Notifications** when CI for the checked-out commit finishes while GitWolf is in the background (Settings to turn off).
+- **Undo** now switches back after a checkout and rewinds a whole rebase; a **Breaking Change** toggle in the commit helpers; **Copy Release Notes Since This Tag** on any tag.
+- **New wolf logo** (app icon, About window, Home screen, menu bar) and a **GitWolf blue** default accent. New About window and Help > Contributors.
+- **Install:** Homebrew (`brew install --cask ipuppyyt/gitwolf/gitwolf`, skips the Open Anyway step), a project website, and install steps in the README.
+- Provider errors now show the server's reason, with *Sign In Again* for browser sign-ins. Copy buttons confirm with "Copied".
+
+### Added (Windows)
+- Provider accounts, pull requests and issues, notifications, safer sync and diff tools, matching the Mac app.
+- In-app updates (signed feed, verified before install), Open in editor/terminal, and custom actions.
+- CI: re-run, cancel and follow checks; a banner to open a pull request after a push.
+- Cached profile pictures, success notices, adjustable panel heights, a Copied confirmation, and tests and a build in CI.
+
+### Changed
+- Menu bar: the new **Hosting** menu holds New Pull Request, New Issue, Notifications and Fork; the Repository menu is shorter.
+- CI lookups pause for five minutes after a host refuses them (rate limit), instead of retrying every few seconds.
+- Windows: trust is asked before hooks run, tokens are hidden in URLs, GitHub Actions are pinned, and the app is faster on large repositories.
+
+### Fixed
+- The checks "re-run" button gave a vague error when no account was signed in.
+- The repository rail clipped tile badges.
+- Home screen buttons now share one size.
+- Changing the accent in the welcome sheet no longer restarts it.]]></description>
+      <enclosure url="https://github.com/ipuppyyt/GitWolf/releases/download/v0.2.0/GitWolf-0.2.0-windows-x64.zip" length="86968077" type="application/octet-stream" sparkle:edSignature="J6R/aXTfEBMY3lYMHggQ/CMegRGZd2AuqLsw5OANqu+SVXGAUpdzZwGclPrQrueIoYOd6ytJ88OfHz7AhoTdBQ=="/>
+    </item>
+  </channel>
+</rss>
+<!-- gitwolf-signature: AgiEi2AIOkcQ/2nDLpBSS+8vek3VCRRUsAiOfuwk8Cf3vHuZkBoet1wFHDCgx9IWUsHbD5U6SirVqZ5lyQDlCQ== -->
