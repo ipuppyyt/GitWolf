@@ -11,6 +11,7 @@ enum OAuthClients {
     static let builtIn: [String: String] = [
         "github.com": "Ov23lir62T7trMJh2u2v",
         "codeberg.org": "b95477b9-cb15-41f9-a908-6f66144466fc",
+        "dev.azure.com": "7f7887ce-43ba-46ce-a447-dbe9f093d84d",
     ]
     private static let key = "oauthClientIDs"
 
