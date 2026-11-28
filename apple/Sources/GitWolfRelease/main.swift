@@ -64,10 +64,46 @@ func option(_ name: String, in args: [String]) -> String? {
 }
 
 func html(forMarkdown text: String) -> String {
-    // Release notes are short Markdown from GitHub; show them as preformatted-but-wrapped text, safely escaped.
-    let escaped = text.replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;")
-        .replacingOccurrences(of: ">", with: "&gt;")
-    return "<pre style=\"font-family: -apple-system, sans-serif; white-space: pre-wrap;\">\(escaped)</pre>"
+    func inline(_ line: String) -> String {
+        var s = line.replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+        let rules: [(String, String)] = [
+            ("`([^`]+)`", "<code>$1</code>"),
+            ("\\*\\*([^*]+)\\*\\*", "<b>$1</b>"),
+            ("\\[([^\\]]+)\\]\\((https?://[^)\\s]+)\\)", "<a href=\"$2\">$1</a>"),
+        ]
+        for (pattern, template) in rules {
+            guard let re = try? NSRegularExpression(pattern: pattern) else { continue }
+            s = re.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: template)
+        }
+        return s
+    }
+
+    var out = ""
+    var items: [String] = []
+    var paragraph: [String] = []
+    func flush() {
+        if !items.isEmpty { out += "<ul>" + items.map { "<li>\(inline($0))</li>" }.joined() + "</ul>"; items = [] }
+        if !paragraph.isEmpty { out += "<p>\(inline(paragraph.joined(separator: " ")))</p>"; paragraph = [] }
+    }
+    for raw in text.components(separatedBy: .newlines) {
+        let line = raw.trimmingCharacters(in: .whitespaces)
+        if line.isEmpty { flush(); continue }
+        if line.hasPrefix("#") {
+            flush()
+            let title = line.drop(while: { $0 == "#" }).trimmingCharacters(in: .whitespaces)
+            out += "<h4>\(inline(title))</h4>"
+        } else if line.hasPrefix("- ") || line.hasPrefix("* ") {
+            if !paragraph.isEmpty { flush() }
+            items.append(String(line.dropFirst(2)))
+        } else if !items.isEmpty {
+            items[items.count - 1] += " " + line
+        } else {
+            paragraph.append(line)
+        }
+    }
+    flush()
+    return "<div style=\"font-family: -apple-system, sans-serif; font-size: 13px;\"><style>h4{margin:14px 0 6px}ul{padding-left:20px;margin:0}li{margin:4px 0}code{font-family:ui-monospace,Menlo,monospace}</style>\(out)</div>"
 }
 
 let args = Array(CommandLine.arguments.dropFirst())
